@@ -9,21 +9,21 @@
 | media | 24-hex | `media list`, `media get`, `media upload` rows, search hits (`mediaId`), `next.watch` | `media get/move/url/download/thumbnail/watch`, `--media` on `search`, `workflow instance create`, `podcast-clips create`; `chat create --content` |
 | template | 24-hex | `workflow template list`, `workflow template describe` | `workflow instance create --template`, `workflow instance list --template` |
 | instance | 24-hex | `workflow instance create/list`, `podcast-clips create/list` (a podcast run is an instance) | `workflow instance get/watch/cancel` |
-| session (a workflow branch) | chat-shaped string | instance views (`sessions`, `outputs[].sessionId`) | only the chat link the CLI prints; `chat send` to a branch session is undocumented, so leave it alone |
+| session (a workflow branch) | chat-shaped string | instance views (`sessions`, `outputs[].sessionId`) | only the chat link the CLI prints; `chat send` to a branch session is not supported |
 | chat | 1 to 64 URL-safe characters | `chat create`, `chat list` | `chat get/send/renders`, `artifact list --chat` |
 | render | 24-hex | instance views (`outputs[].renderId`), `chat renders` | `output url`, `output share` |
 | artifact | `<type>/<id>` | `artifact list`, `chat send` output lines | `artifact url`, `chat send --artifact` (same chat only) |
 
 Rules:
 
-- Take every id from a list or view in the same session. `output url` and `output share` sign any 24-hex value, existing or not, so a typed id yields a link that 404s at the storage URL.
+- Take every id from a list or view in the same session; a typed or remembered id is the usual reason a link fails.
 - A template id the user pastes goes through `workflow template describe` first: that validates it and adds it to `workflow template list` for next time (shared templates are not listed until then).
 - `--media` accepts several ids; the CLI deduplicates them because fan-out templates bill per item.
 - A UUID in `chat renders` is a legacy video id; `output url` rejects it, and the user opens it in the app.
 
 ## Links the CLI prints
 
-Pass links through as printed. The instance page path is temporary and will move; composing it by hand breaks first.
+Pass links through as printed; composing one by hand is unsupported.
 
 | Link | Printed by | Purpose |
 | --- | --- | --- |

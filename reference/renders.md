@@ -22,14 +22,14 @@ Neither URL contains the API key, so both are safe to paste.
 
 `starzero output render --library <id> --clip <mediaId>:<start>-<end> [--clip ...]` cuts the given moments, in order, into one video and prints a signed URL. The ranges are the ones `search transcript` and `search visual` print (seconds, decimals allowed), so this is how the user looks at what a search found, or downloads it.
 
-- Watermarked by default, and free. `--no-watermark` gives a clean render, bills credits (per rendered minute) and needs a subscription; it counts as a billed command under `credits.md`.
+- Watermarked by default, and free. `--no-watermark` gives a clean render, bills credits (per rendered minute); it counts as a billed command under `credits.md`.
 - `--height` (default 1080) and `--aspect` (`9:16`, `2:3`, `4:5`, `1:1`, `5:4`, `16:9`; default keeps the source ratio) size the output.
 - The command blocks until the render is done (`--timeout`, default 600 s; exit 6 cancels the render). A short compilation takes seconds.
 - The URL is the whole result: a temporary render has no record, so `output url` and `output share` cannot serve it, and there are no `next` hints. The URL is valid for about a day and the file for longer; download it with `curl -o` while it is. JSON: `{ "renderId", "width", "height", "durationSeconds", "url", "urlExpiresInSeconds" }`.
 
 ## Rules
 
-- Render ids come from a view in this session. The signing endpoint accepts any 24-hex value, so an id from memory or from the user's typing produces a link that fails at the storage URL with a 404.
+- Render ids come from a view in this session. An id from memory or from the user's typing is the usual reason a link fails with a 404.
 - `outputs 0/n` on an instance view means the run is not finished or its branches failed; go back to `waiting.md` before asking for links.
 - A UUID row in `chat renders` is a legacy video the CLI cannot serve; the user opens that one in the app.
 - Artifacts are not renders. `artifact url <type>/<id>` gives a presigned URL for a file a chat used or produced (an uploaded image, a document, a `video` artifact); a render is the compiled output. Use `chat renders` for the videos and `artifact list --chat <id>` for everything else.

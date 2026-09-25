@@ -32,7 +32,7 @@ In order:
 
 ## Scopes per job
 
-Inferred from the APIs; a 401 or a code-less 403 is how a missing scope shows up.
+A missing scope shows up as exit 3 on the command that needs it.
 
 | Job | Scopes |
 | --- | --- |
@@ -44,7 +44,7 @@ Inferred from the APIs; a 401 or a code-less 403 is how a missing scope shows up
 | `search transcript`, `search visual` | `library:search` |
 | `workflow instance create`, `podcast-clips create` | `profile:read`, `billing:read`, `library:read`, `library:search`, `rendering:read`, `rendering:write` |
 | `output url`, `output share` | `rendering:read` |
-| `chat *`, `artifact *` | the bearer key; no documented scope |
+| `chat *`, `artifact *` | any valid key |
 
 The plugin's install prompt asks for the full set above so one key serves every skill.
 

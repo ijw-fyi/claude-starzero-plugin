@@ -8,7 +8,7 @@ The CLI plans the upload locally and prints the plan with `--dry-run`:
 
 - Files under 1 KiB are skipped as `too-small`.
 - With ffprobe present, files with neither an audio nor a video stream are skipped as `non-media`, durations are read, and the credit estimate is computed. Without ffprobe the upload still works; the estimate and the non-media filter are skipped with a warning. The plugin's setup installs ffprobe next to the CLI on Linux and Windows and points macOS users at Homebrew.
-- Each file gets a fingerprint (`size-xxh32(first 8 KiB)-xxh32(last 8 KiB)`, the same the web app uses). A media item in the library with the same fingerprint is reported as `already-uploaded` with its id and status instead of being sent again.
+- Each file gets a content fingerprint, the same one the web app uses. A media item in the library with the same fingerprint is reported as `already-uploaded` with its id and status instead of being sent again.
 - The plan line reads `~N credits (M left)`; exit 5 `REFUSED_CREDITS` or `REFUSED_STORAGE` means nothing was sent.
 
 Flags to know: `--folder` must already exist (`folder create --path ...` first); `--name` applies to a single file; `--meta key=value` repeats; `--watch` also waits for processing, though a separate `media watch` is the safer choice in a session.

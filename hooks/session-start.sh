@@ -9,10 +9,10 @@
 # before the binary exists. While the plugin option is set it is the source of truth for the file;
 # clear the option to manage the key with `starzero auth` instead.
 #
-# FIXME: the credentials file is a plaintext 0600 copy of a key Claude Code already holds in its
-# own secure store. Acceptable once: the keychain is not reachable from every sandbox and the
-# binary is absent on first run. Retire when the CLI can import this file into the OS keychain
-# (planned `starzero auth migrate`), at which point this hook stops exporting STARZERO_KEYRING=0.
+# Note: the credentials file is a 0600 copy of a key Claude Code also holds in its own secure
+# store. It is what works on the first session, before the binary exists, and where no OS
+# keychain is reachable. A user who prefers the keychain clears the option, removes the file and
+# runs `starzero auth login`.
 set -eu
 
 root="${CLAUDE_PLUGIN_ROOT:?CLAUDE_PLUGIN_ROOT is set by Claude Code for plugin hooks}"

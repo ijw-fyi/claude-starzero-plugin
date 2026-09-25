@@ -15,7 +15,7 @@ Hands a StarZero render over as a link: a public share page for sending, or a si
 
 ## Steps
 
-1. Take the render id from a view in this session. The signing endpoint accepts any 24-hex value, so a typed or remembered id yields a link that 404s at the storage URL. Find it in one of these:
+1. Take the render id from a view in this session; a typed or remembered id is the usual reason a link 404s. Find it in one of these:
    - A workflow run: `starzero workflow instance get <instanceId>`; each finished branch is one entry in `outputs[]` with its `renderId` and the chat link of the branch that made it. The instance id comes from `starzero workflow instance list` (`--status completed` narrows it).
    - A podcast run: `starzero podcast-clips list` prints instance ids, then the same `workflow instance get`.
    - A chat: `starzero chat renders <chatId>`; the chat id comes from `starzero chat list`.
@@ -49,7 +49,7 @@ Hands a StarZero render over as a link: a public share page for sending, or a si
 | exit 3 | key missing, invalid or lacking a scope | stop; ask the user to run `/starzero:setup` |
 | exit 2, `--expires` rejected | the value is above 604800 seconds | lower it; 7 days is the maximum |
 | exit 2, id of the wrong shape | the render id is not 24-hex | take it from `outputs[].renderId` or `chat renders` |
-| the link 404s at the storage URL | the id was signed but no render exists under it | locate the id in a view from this session and sign again |
+| the link 404s at the storage URL | no render exists under that id | locate the id in a view from this session and sign again |
 | `outputs 0/n` on an instance view | the run is not finished or its branches failed | read `waiting.md`; `workflow instance watch <instanceId>` first, then `instance get` |
 | exit 7 on `instance watch` | some branches failed | report which failed from the sessions table and their chat links before asking for links |
 | UUID row in `chat renders` | a legacy video the CLI cannot serve; `output url` rejects it | the user opens it in the app |
