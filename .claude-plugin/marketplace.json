@@ -1,0 +1,20 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "starzero",
+  "description": "StarZero plugins for Claude Code.",
+  "owner": {
+    "name": "StarZero",
+    "email": "dev@starzero.ai",
+    "url": "https://app.starzero.ai"
+  },
+  "plugins": [
+    {
+      "name": "starzero",
+      "description": "Upload media to StarZero, search transcripts and visuals, run workflow templates, cut podcast clips and share renders through the starzero CLI.",
+      "version": "0.1.0",
+      "source": "./",
+      "category": "productivity",
+      "keywords": ["starzero", "video", "media", "transcript", "search", "workflow", "podcast", "clips"]
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  static:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install the Claude Code CLI and shellcheck
+        run: |
+          npm install --global @anthropic-ai/claude-code
+          sudo apt-get update -qq && sudo apt-get install -y -qq shellcheck
+      - name: Validate the plugin and marketplace manifests
+        run: |
+          claude plugin validate . --strict
+          claude plugin validate .claude-plugin/plugin.json --strict
+      - name: Lint the shell scripts
+        run: shellcheck -s sh scripts/* hooks/*.sh test/*.sh
+      - name: Manifest versions agree
+        run: scripts/check-versions.sh
+      - name: Hook tests
+        run: test/hooks.sh
+      - name: Launcher installs the pinned CLI
+        run: test/launcher.sh

@@ -1,0 +1,157 @@
+#!/bin/sh
+# ensure-tools starzero | ffprobe
+#
+# Installs the pinned starzero CLI (reference/CLI_VERSION) or a static ffprobe into
+# $STARZERO_CONFIG_DIR/bin/<cli version>/ (default ~/.starzero/bin/<cli version>/).
+# The CLI looks for ffprobe next to its own binary first, so both land in the same folder.
+# Idempotent: a tool that is already present is left alone. Every download is verified against
+# the publisher's SHA256 list before anything is extracted or run.
+set -eu
+
+plugin_root=$(cd "$(dirname "$0")/.." && pwd)
+cli_version=$(tr -d '[:space:]' < "$plugin_root/reference/CLI_VERSION")
+config_dir="${STARZERO_CONFIG_DIR:-$HOME/.starzero}"
+tool_dir="$config_dir/bin/$cli_version"
+
+cli_release_base="https://github.com/ijw-fyi/starzero-cli-releases/releases/download/v$cli_version"
+ffprobe_release_base="https://github.com/BtbN/FFmpeg-Builds/releases/download/latest"
+
+fail() { printf 'ensure-tools: %s\n' "$*" >&2; exit 1; }
+
+os=$(uname -s)
+arch=$(uname -m)
+case "$os" in
+  Linux) platform_os=linux ;;
+  Darwin) platform_os=darwin ;;
+  MINGW*|MSYS*|CYGWIN*) platform_os=windows ;;
+  *) fail "unsupported operating system: $os" ;;
+esac
+case "$arch" in
+  x86_64|amd64) platform_arch=x64 ;;
+  aarch64|arm64) platform_arch=arm64 ;;
+  *) fail "unsupported CPU architecture: $arch" ;;
+esac
+platform="$platform_os-$platform_arch"
+
+if command -v sha256sum >/dev/null 2>&1; then
+  sha256_of() { sha256sum "$1" | cut -d' ' -f1; }
+elif command -v shasum >/dev/null 2>&1; then
+  sha256_of() { shasum -a 256 "$1" | cut -d' ' -f1; }
+else
+  fail "neither sha256sum nor shasum is available to verify downloads"
+fi
+
+download() {
+  # download <url> <destination>
+  curl -fsSL --retry 3 --retry-delay 2 -o "$2" "$1" \
+    || fail "download failed: $1 (offline, or the release is missing?)"
+}
+
+expected_sha256() {
+  # expected_sha256 <checksum file> <file name>: the published digest for one file
+  awk -v name="$2" '{ sub(/^\*/, "", $2); if ($2 == name) { print $1; exit } }' "$1"
+}
+
+verify() {
+  # verify <file> <checksum file>: exit 0 when the digest matches, 1 otherwise
+  name=$(basename "$1")
+  want=$(expected_sha256 "$2" "$name")
+  [ -n "$want" ] || fail "$name is not listed in the publisher's checksum file"
+  have=$(sha256_of "$1")
+  [ "$have" = "$want" ]
+}
+
+extract() {
+  # extract <archive> <directory>: unpack any of the archive formats the two publishers use
+  case "$1" in
+    *.tar.gz) tar -xzf "$1" -C "$2" ;;
+    *.tar.xz) tar -xJf "$1" -C "$2" ;;
+    *.zip)
+      if command -v unzip >/dev/null 2>&1; then unzip -q -o "$1" -d "$2"; else tar -xf "$1" -C "$2"; fi ;;
+    *) fail "unknown archive format: $1" ;;
+  esac
+}
+
+install_file() {
+  # install_file <source> <name>: copy into tool_dir under a temporary name, then rename. The
+  # work dir is usually on another filesystem, so a direct mv would be a copy that a kill could
+  # leave truncated but executable; the rename within one directory is atomic.
+  mkdir -p "$tool_dir"
+  cp "$1" "$tool_dir/$2.partial"
+  chmod +x "$tool_dir/$2.partial"
+  mv -f "$tool_dir/$2.partial" "$tool_dir/$2"
+}
+
+work_dir=$(mktemp -d)
+trap 'rm -rf "$work_dir"' EXIT INT TERM
+
+install_starzero() {
+  case "$platform_os" in
+    windows) binary=starzero.exe; asset="starzero-$platform.zip" ;;
+    *) binary=starzero; asset="starzero-$platform.tar.gz" ;;
+  esac
+  if [ -x "$tool_dir/$binary" ]; then
+    printf 'starzero %s is already installed in %s\n' "$cli_version" "$tool_dir"
+    return
+  fi
+  case "$platform" in
+    linux-x64|linux-arm64|darwin-arm64|windows-x64) ;;
+    *) fail "starzero has no build for $platform (see https://github.com/ijw-fyi/starzero-cli-releases)" ;;
+  esac
+  download "$cli_release_base/SHA256SUMS" "$work_dir/SHA256SUMS"
+  download "$cli_release_base/$asset" "$work_dir/$asset"
+  verify "$work_dir/$asset" "$work_dir/SHA256SUMS" || fail "checksum mismatch for $asset; nothing was installed"
+  mkdir "$work_dir/unpacked"
+  extract "$work_dir/$asset" "$work_dir/unpacked"
+  [ -f "$work_dir/unpacked/$binary" ] || fail "$asset did not contain $binary"
+  install_file "$work_dir/unpacked/$binary" "$binary"
+  printf 'starzero %s installed to %s\n' "$cli_version" "$tool_dir"
+}
+
+install_ffprobe() {
+  case "$platform_os" in
+    windows) binary=ffprobe.exe ;;
+    *) binary=ffprobe ;;
+  esac
+  if [ -x "$tool_dir/$binary" ]; then
+    printf 'ffprobe is already installed in %s\n' "$tool_dir"
+    return
+  fi
+  if [ "$platform_os" = darwin ]; then
+    if command -v ffprobe >/dev/null 2>&1; then
+      printf 'ffprobe found on PATH at %s\n' "$(command -v ffprobe)"
+    else
+      printf 'ffprobe is optional and there is no static macOS build to fetch. Install it with: brew install ffmpeg\n'
+    fi
+    return
+  fi
+  case "$platform" in
+    linux-x64) asset=ffmpeg-master-latest-linux64-lgpl.tar.xz ;;
+    linux-arm64) asset=ffmpeg-master-latest-linuxarm64-lgpl.tar.xz ;;
+    windows-x64) asset=ffmpeg-master-latest-win64-lgpl.zip ;;
+    *) fail "no static ffprobe build for $platform; install ffmpeg with your package manager" ;;
+  esac
+  printf 'downloading ffprobe (about 100-200 MB, LGPL build from BtbN/FFmpeg-Builds)\n'
+  attempt=1
+  while :; do
+    download "$ffprobe_release_base/checksums.sha256" "$work_dir/checksums.sha256"
+    download "$ffprobe_release_base/$asset" "$work_dir/$asset"
+    if verify "$work_dir/$asset" "$work_dir/checksums.sha256"; then break; fi
+    # The publisher replaces the "latest" assets daily and the two files can be from different
+    # builds for a short window; one fresh fetch of both resolves that.
+    [ "$attempt" -lt 2 ] || fail "checksum mismatch for $asset twice; nothing was installed"
+    attempt=$((attempt + 1))
+  done
+  mkdir "$work_dir/unpacked"
+  extract "$work_dir/$asset" "$work_dir/unpacked"
+  found=$(find "$work_dir/unpacked" -type f -name "$binary" | head -n 1)
+  [ -n "$found" ] || fail "$asset did not contain $binary"
+  install_file "$found" "$binary"
+  printf 'ffprobe installed to %s\n' "$tool_dir"
+}
+
+case "${1:-}" in
+  starzero) install_starzero ;;
+  ffprobe) install_ffprobe ;;
+  *) fail "usage: ensure-tools starzero | ffprobe" ;;
+esac

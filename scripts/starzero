@@ -1,0 +1,20 @@
+#!/bin/sh
+# Launcher for the pinned starzero CLI. Installs it on first use, then hands over to it.
+# The install directory is put on PATH so the CLI can find a sibling ffprobe.
+set -eu
+
+here=$(cd "$(dirname "$0")" && pwd)
+cli_version=$(tr -d '[:space:]' < "$here/../reference/CLI_VERSION")
+tool_dir="${STARZERO_CONFIG_DIR:-$HOME/.starzero}/bin/$cli_version"
+
+case "$(uname -s)" in
+  MINGW*|MSYS*|CYGWIN*) exe="$tool_dir/starzero.exe" ;;
+  *) exe="$tool_dir/starzero" ;;
+esac
+
+# Installer output goes to stderr so `--json` callers keep a clean stdout.
+[ -x "$exe" ] || "$here/ensure-tools" starzero >&2
+
+PATH="$tool_dir:$PATH"
+export PATH
+exec "$exe" "$@"
