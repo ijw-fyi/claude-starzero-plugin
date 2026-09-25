@@ -30,4 +30,4 @@ A `create` that already returned an instance id has started billing. On 6, 7, 13
 
 ## `chat send` waits differently
 
-`chat send` streams the agent's turn instead of polling: it prints text, tool digests and questions as they arrive, with a 60 s idle timeout and a 600 s overall `--timeout`. Exit 6 means the turn is still running; `chat get <chatId>` shows `processing` until it settles, then the transcript. Send the next message only after `processing` is false.
+`chat send` streams the agent's turn instead of polling: it prints text, a tool digest every 30 s and questions as they arrive, with a 60 s idle timeout and a 600 s overall `--timeout` by default. A turn can take many minutes, so keep the default and give the Bash call the longest timeout the tool allows instead of shortening the wait; `--tools` (every tool call with its arguments) stays off unless a turn needs diagnosing. Exit 6, or a cut-off Bash call, means the turn is still running; `chat get <chatId>` shows `processing` until it settles, then the transcript. Send the next message only after `processing` is false.
