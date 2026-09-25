@@ -1,7 +1,7 @@
 {
   "name": "starzero",
   "displayName": "StarZero",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Upload media to StarZero, search transcripts and visuals, run workflow templates, cut podcast clips and share renders through the starzero CLI.",
   "author": {
     "name": "StarZero",
