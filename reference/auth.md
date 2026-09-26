@@ -10,7 +10,7 @@ In order:
 
 ## How this plugin supplies it
 
-- The plugin's "StarZero API key" option (asked at install, editable from `/config`) is written by the plugin's session hook to the credentials file, and the hook exports `STARZERO_KEYRING=0` for the session. Nothing else is needed on Claude Code.
+- The plugin's "StarZero API key" option (asked when the plugin is enabled; `/plugin configure starzero` opens the dialog again, since `/config` lists only non-sensitive options) is written by the plugin's session hook to the credentials file, and the hook exports `STARZERO_KEYRING=0` for the session. Nothing else is needed on Claude Code.
 - While that option is set it owns the file. A user who prefers `starzero auth login` clears the option first.
 - The hook exports `STARZERO_KEYRING=0` whenever a credentials file exists, so a plugin session reads that file in preference to the keychain. To go back to the keychain, remove `~/.starzero/credentials` as well.
 - Cowork does not prompt for plugin options. There the setup skill asks the user to paste the key in the chat and stores it with `starzero auth login --api-key <key>` (OS keychain, or the credentials file with `STARZERO_KEYRING=0` when no keychain is reachable). The conversation then holds the key; the user is told so once, with the API keys page as the place to revoke it.

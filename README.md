@@ -59,7 +59,8 @@ on PATH.
 
 - CLI and ffprobe: `~/.starzero/bin/<version>/` (or `$STARZERO_CONFIG_DIR/bin/<version>/`).
 - API key: written by the plugin to `~/.starzero/credentials` (mode 0600) from the option you set
-  at install. Clear the option in `/config` to manage the key yourself with `starzero auth login`.
+  at install (`/plugin configure starzero` opens that dialog again). Clear the option there to
+  manage the key yourself with `starzero auth login`.
 - The pinned CLI version is in `reference/CLI_VERSION`; a plugin update may move it.
 
 ## Other surfaces
