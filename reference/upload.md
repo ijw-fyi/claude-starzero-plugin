@@ -21,6 +21,6 @@ Flags to know: `--folder` must already exist (`folder create --path ...` first);
 
 One row per file: `OUTCOME  MEDIA  STATUS  FILE`, with outcomes `uploaded`, `already-uploaded`, `skipped`, `failed`, `planned`. Then a summary and `next.watch` with the exact `media watch` command for the new media ids. Run that command; processing takes minutes even for short clips, and a search finds nothing until the media is `completed`.
 
-Exit 7 `UPLOAD_PARTIAL` means some files landed and some did not. Re-running the same upload command is safe: files that landed are skipped by fingerprint, and the hint says so. Hand-rolled retries of individual parts are not.
+Exit 7 `UPLOAD_PARTIAL` means some files landed and some did not. Re-running the same upload command is safe: files that landed are skipped by fingerprint, and the hint says so. Hand-rolled retries of individual parts are not. A `failed` row that still shows a media id (the server created the record before the failure) is checked with `media get <id>` before any re-run: it may be processing. The finish call waits as long as the server takes, so a slow finish is a working upload.
 
 Warnings worth relaying: several video or audio streams, more than two audio channels, more than 10 hours (the API rejects those).

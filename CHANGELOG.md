@@ -7,6 +7,8 @@
   forced a yes/no box on every billed command is gone, and with it the `confirm_billed_commands`
   option; the box had no "always allow" and could not be waived.
 - The SessionStart hook is the only hook left: it puts the CLI on PATH and hands over the key.
+- CLI pinned at 0.5.3: `media upload` waits for the finish call as long as the server takes, and a
+  file that fails after its record was created keeps its media id in the row.
 
 ## 0.2.0
 
