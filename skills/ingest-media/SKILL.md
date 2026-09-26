@@ -29,10 +29,10 @@ Uploads the files the user names (`$ARGUMENTS`: files, or a folder to expand int
 `media upload` without `--dry-run` bills the processing of the new media. Before running it:
 
 1. State the exact command and what it bills: the `~N credits (M left)` line from the dry run, or, when ffprobe was absent, "unestimated" next to `creditsLeft` from `starzero credits`.
-2. Run it, with the estimate in the Bash call's `description`, for example `Upload 3 files to the Interviews library (bills ~48 credits, 12,400 left)`. The plugin's permission prompt shows that description, so it is the confirmation; a yes in words on top of it would make the user confirm twice. Ask a question only when there is a decision to make: the prompt is off (the user chose that), or `--skip-credit-check` is on the table.
-3. Run it once. Re-running the whole command after a partial failure is safe because landed files are skipped by fingerprint.
+2. Ask once, in words, and wait for the answer: one question that carries the files, the estimate and the balance ("Upload 3 files to the Interviews library for about 48 credits, of 12,400 left. Go ahead?"). The user can waive this question for the session (`credits.md`, "Waiving the question"); the statement in step 1 still comes first. The Bash call's `description` repeats the estimate, for example `Upload 3 files to the Interviews library (bills ~48 credits, 12,400 left)`.
+3. Run it once, after the yes. Re-running the whole command after a partial failure is safe because landed files are skipped by fingerprint.
 
-`--skip-credit-check` bypasses the exit 5 refusal. Offer it only when the user asks to proceed anyway; that is a decision to ask about in words, and the prompt covers the flag too.
+`--skip-credit-check` bypasses the exit 5 refusal. Offer it only when the user asks to proceed anyway; that is a decision to ask about even when the question is waived.
 
 ## Report back
 

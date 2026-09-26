@@ -36,8 +36,8 @@ See `starzero <group> <command> --help` for the remaining flags.
 The only billed command here is `starzero output render ... --no-watermark`: currently 250 credits per rendered minute, and the CLI sends it once, without retry. Before running it:
 
 1. Run `starzero credits` (free), then state the exact command, what it bills ("a clean render of N seconds", N being the summed clip lengths; `durationSeconds` of a watermarked trial is the same number) and `creditsLeft`.
-2. Run it, with the billing in the Bash call's `description`, for example `Start the highlights workflow on 5 media (billed run; 12,400 credits left)`. The plugin's permission prompt shows that description, so it is the confirmation; a yes in words on top of it would make the user confirm twice. Ask a question only when there is a decision to make: the prompt is off (the user chose that), a run is already active, validation was skipped, or a flag such as `--force` or `--skip-credit-check` is on the table.
-3. Run it once. Exit 6 cancelled it; a second run is a second bill and goes through the prompt again.
+2. Ask once, in words, and wait for the answer: one question that carries the command, the billing and the balance ("Clean render of 42 s of clips, about 175 credits, 12,400 left. Go ahead?"). The user can waive this question for the session (`credits.md`, "Waiving the question"); the statement in step 1 still comes first. The Bash call's `description` repeats the billing line, for example `Clean render of 42 s of clips (billed; 12,400 credits left)`.
+3. Run it once, after the yes. Exit 6 cancelled it; a second run is a second bill and is asked about again.
 
 Every other command in this skill is free, with the search caveat above.
 
