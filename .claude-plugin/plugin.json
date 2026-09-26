@@ -10,8 +10,20 @@
   },
   "homepage": "https://app.starzero.ai",
   "repository": "https://github.com/ijw-fyi/claude-starzero-plugin",
+  "privacyPolicyUrl": "https://starzero.ai/privacy/",
+  "termsOfServiceUrl": "https://starzero.ai/terms/",
+  "supportUrl": "https://github.com/ijw-fyi/claude-starzero-plugin/issues",
   "license": "MIT",
-  "keywords": ["starzero", "video", "media", "transcript", "search", "workflow", "podcast", "clips"],
+  "keywords": [
+    "starzero",
+    "video",
+    "media",
+    "transcript",
+    "search",
+    "workflow",
+    "podcast",
+    "clips"
+  ],
   "userConfig": {
     "api_key": {
       "type": "string",
