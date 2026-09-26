@@ -2,8 +2,8 @@
 
 ## 0.2.0
 
-- CLI pinned at 0.5.1: `starzero credits` for the balance, plan and credit notes; `output render`
-  for temporary renders of search moments; `chat send` waits for the whole turn.
+- CLI pinned at 0.5.2: `starzero credits` for the balance, plan and credit notes; `output render`
+  for temporary renders of search moments; no wait has a default limit.
 - One confirmation per billed command, through the permission prompt, with the cost and balance
   in its title. Skills no longer ask in words as well.
 - Human CLI output by default; `--json` only where a value is read mechanically.

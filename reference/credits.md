@@ -18,7 +18,7 @@ Before any of the billed commands:
 
 1. Run `starzero credits` and say what will run, as the exact command, what it bills, and the balance it draws on (`creditsLeft`, plus the soonest note expiry when one is close): the estimate from `--dry-run` for uploads, "one run of template X on N media items" for workflows, "one clip run" for podcasts, "one agent turn" for chats, "a clean render of N seconds" for `--no-watermark`.
 2. Confirm once, through the prompt. Put the billing in the Bash call's `description` (`Upload 3 files to Interviews (bills ~48 credits, 12,400 left)`, `Start workflow X on 5 media (billed run; 12,400 credits left)`): the plugin's permission prompt ("Ask before spending credits") shows that description, so the user sees the cost and the balance in the box and confirms there. A yes in words on top of it is one too many. Questions in words are for decisions: the prompt is off (the user chose that in `/config`), a run is already active, validation was skipped, or a flag such as `--force` or `--skip-credit-check` is being considered.
-3. Run it once. A create that errored after returning an id, timed out, or was interrupted has started; `waiting.md` covers resuming it. A second create is a second bill and goes through the prompt again.
+3. Run it once. `workflow instance create` and `podcast-clips create` say so when they return: the run started and is being billed. A create that errored after returning an id, timed out, or was interrupted has started; `waiting.md` covers resuming it. A second create is a second bill and goes through the prompt again.
 
 ## One run at a time
 
