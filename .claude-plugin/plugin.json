@@ -1,7 +1,7 @@
 {
   "name": "starzero",
   "displayName": "StarZero",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Upload media to StarZero, search transcripts and visuals, run workflow templates, cut podcast clips and share renders through the starzero CLI.",
   "author": {
     "name": "StarZero",
@@ -31,12 +31,6 @@
       "description": "Create a key at https://app.starzero.ai/settings/api-keys with the profile:read, billing:read, library:read, library:search, rendering:read and rendering:write scopes, then paste it here. Claude Code stores it securely, outside your settings file.",
       "sensitive": true,
       "required": false
-    },
-    "confirm_billed_commands": {
-      "type": "boolean",
-      "title": "Ask before spending credits",
-      "description": "Show a confirmation, with the estimated cost, before uploads, workflow runs, podcast clips, chat turns and clean renders, which all use StarZero credits. Off means those commands run without a confirmation.",
-      "default": true
     }
   }
 }

@@ -12,18 +12,6 @@
           }
         ]
       }
-    ],
-    "PreToolUse": [
-      {
-        "matcher": "Bash|PowerShell",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/consent.sh\"",
-            "timeout": 5
-          }
-        ]
-      }
     ]
   }
 }

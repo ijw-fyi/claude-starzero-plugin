@@ -29,10 +29,10 @@ Uploads the files the user names (`$ARGUMENTS`: files, or a folder to expand int
 `media upload` without `--dry-run` bills the processing of the new media. Before running it:
 
 1. State the exact command and what it bills: the `~N credits (M left)` line from the dry run, or, when ffprobe was absent, "unestimated" next to `creditsLeft` from `starzero credits`.
-2. Run it, with the estimate in the Bash call's `description`, for example `Upload 3 files to the Interviews library (bills ~48 credits, 12,400 left)`. The plugin's permission prompt shows that description, so it is the confirmation; a yes in words on top of it would make the user confirm twice. Ask a question only when there is a decision to make: the prompt is off (the user chose that), or `--skip-credit-check` is on the table.
-3. Run it once. Re-running the whole command after a partial failure is safe because landed files are skipped by fingerprint.
+2. Ask once, in words, and wait for the answer: one question that carries the files, the estimate and the balance ("Upload 3 files to the Interviews library for about 48 credits, of 12,400 left. Go ahead?"). The user can waive this question for the session (`credits.md`, "Waiving the question"); the statement in step 1 still comes first. The Bash call's `description` repeats the estimate, for example `Upload 3 files to the Interviews library (bills ~48 credits, 12,400 left)`.
+3. Run it once, after the yes. Re-running the whole command after a partial failure is safe because landed files are skipped by fingerprint.
 
-`--skip-credit-check` bypasses the exit 5 refusal. Offer it only when the user asks to proceed anyway; that is a decision to ask about in words, and the prompt covers the flag too.
+`--skip-credit-check` bypasses the exit 5 refusal. Offer it only when the user asks to proceed anyway; that is a decision to ask about even when the question is waived.
 
 ## Report back
 
@@ -54,6 +54,7 @@ Uploads the files the user names (`$ARGUMENTS`: files, or a folder to expand int
 | rows `already-uploaded` | same fingerprint already in the library | use the printed media id; nothing to upload |
 | upload refuses `--folder` | the path does not exist | `folder create --path`, then re-run |
 | exit 7 `UPLOAD_PARTIAL` | some files landed, some did not | re-run the same upload command; landed files are skipped |
+| a `failed` row with a media id | the server created the record, then the file failed | `media get <id>` first; it may be processing, and a re-run skips it by fingerprint |
 | exit 1 on upload | every attempted file failed | relay `message`, `hint` and `requestId` from stderr |
 | exit 3 during a batch | the batch aborted on an auth error | `/starzero:setup`, then re-run the same command |
 | `cooldown` events on stderr | a part hit a 500 or 503 and waits 30 s | the upload is working; wait |

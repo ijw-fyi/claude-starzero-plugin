@@ -17,8 +17,8 @@ Billing starts at the request. `workflow instance cancel` stops a run and refund
 Before any of the billed commands:
 
 1. Run `starzero credits` and say what will run, as the exact command, what it bills, and the balance it draws on (`creditsLeft`, plus the soonest note expiry when one is close): the estimate from `--dry-run` for uploads, "one run of template X on N media items" for workflows, "one clip run" for podcasts, "one agent turn" for chats, "a clean render of N seconds" for `--no-watermark`.
-2. Confirm once, through the prompt. Put the billing in the Bash call's `description` (`Upload 3 files to Interviews (bills ~48 credits, 12,400 left)`, `Start workflow X on 5 media (billed run; 12,400 credits left)`): the plugin's permission prompt ("Ask before spending credits") shows that description, so the user sees the cost and the balance in the box and confirms there. A yes in words on top of it is one too many. Questions in words are for decisions: the prompt is off (the user chose that in `/config`), a run is already active, validation was skipped, or a flag such as `--force` or `--skip-credit-check` is being considered.
-3. Run it once. `workflow instance create` and `podcast-clips create` say so when they return: the run started and is being billed. A create that errored after returning an id, timed out, or was interrupted has started; `waiting.md` covers resuming it. A second create is a second bill and goes through the prompt again.
+2. Ask once, in words, and wait for the answer. One short question that carries the same line ("Upload 3 files to Interviews for about 48 credits, of 12,400 left. Go ahead?"), with any decision folded into it: a run is already active, validation was skipped, or a flag such as `--force` or `--skip-credit-check` is being considered. The Bash call's `description` repeats the billing line (`Upload 3 files to Interviews (bills ~48 credits, 12,400 left)`), so a permission box, where one appears, shows it too.
+3. Run it once, after the yes. `workflow instance create` and `podcast-clips create` say so when they return: the run started and is being billed. A create that errored after returning an id, timed out, or was interrupted has started; `waiting.md` covers resuming it. A second create is a second bill and is asked about again.
 
 ## One run at a time
 
@@ -29,7 +29,11 @@ Workflow runs and podcast-clip runs draw on the same balance as they go. Two run
 - `starzero credits` is free and shows the account as a short table: the credits left, the plan and its term end ("free" without a subscription), and the credit notes still holding credits, soonest expiry first. `--json` gives the same as `{ "creditsLeft", "plan", "notes" }`. It needs `billing:read`.
 - `media upload --dry-run` prints the estimate next to the balance (`~N credits (M left)`) and refuses with exit 5 when the estimate exceeds the balance or the storage limit. `--skip-credit-check` bypasses that refusal; offer it only when the user asks to proceed anyway. Any exit 5 for lack of credits points at `starzero credits`.
 - Spend shows up as `creditsUsed` on instance views, per session in the sessions table, and in the `chat send` footer.
-- Workflow and podcast runs take a while (minutes to tens of minutes) and can use a large share of a balance. When `creditsLeft` is under 100,000 before a `workflow instance create` or `podcast-clips create`, put a warning in the permission box title ("balance is low for a workflow run: 42,000 credits left") so the user decides with that in view.
+- Workflow and podcast runs take a while (minutes to tens of minutes) and can use a large share of a balance. When `creditsLeft` is under 100,000 before a `workflow instance create` or `podcast-clips create`, put a warning in the question ("balance is low for a workflow run: 42,000 credits left") so the user decides with that in view.
+
+## Waiving the question
+
+The user can waive the question: "go ahead without asking", "skip the credit confirmations", or a line to that effect in their CLAUDE.md. That holds for the rest of the session, or until they say otherwise; a CLAUDE.md line holds across sessions. With the question waived, the statement in step 1 still comes before each billed command, and the decisions from step 2 (an active run, skipped validation, `--force`, `--skip-credit-check`) are still asked, since those change what runs, not whether it bills.
 
 ## Warnings that still bill
 

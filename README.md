@@ -46,10 +46,12 @@ Skills trigger on their own from what you say; `/starzero:<skill>` runs one dire
 ## Credits and confirmation
 
 Uploads, workflow runs, podcast clip runs, chat turns and clean (`--no-watermark`) renders spend
-StarZero credits. Before each one, the plugin shows a permission prompt whose title carries what
-the command bills and your balance (uploads show the dry-run estimate, for example "bills ~48
-credits"). That prompt is the confirmation. Turning it off under **Ask before spending credits**
-in `/config` means those commands run without one.
+StarZero credits. Before each one, Claude states what the command bills and your balance (uploads
+show the dry-run estimate, for example "about 48 credits, of 12,400 left") and asks whether to go
+ahead. To skip the question, say so ("go ahead without asking") and it stays skipped for the rest
+of the session; a line in your `CLAUDE.md` makes that permanent. Claude still tells you the cost
+before each billed command, and still asks about decisions that change what runs, such as
+starting a second run while one is active.
 Please keep the plugin's hooks enabled: `disableAllHooks` also removes the hook that puts the CLI
 on PATH.
 
@@ -78,7 +80,7 @@ on PATH.
 ```sh
 claude --plugin-dir .          # load the working tree for one session
 claude plugin validate . --strict
-test/hooks.sh                  # consent and session-start hooks, no network
+test/hooks.sh                  # session-start hook, no network
 test/launcher.sh               # downloads the pinned CLI into a temp HOME
 scripts/check-versions.sh
 ```

@@ -32,7 +32,7 @@ Hands a StarZero render over as a link: a public share page for sending, or a si
 
 ## Billing
 
-`output url` and `output share` spend nothing. The one billed path near this skill is a fresh `output render --no-watermark` (250 credits per rendered minute); before running it, state the exact command and the summed clip length, put the billing in the Bash call's `description` (for example `Clean render of 42 s of clips (billed; 12,400 credits left)`), then run it once; the plugin's "Ask before spending credits" prompt shows that description and is where the user confirms.
+`output url` and `output share` spend nothing. The one billed path near this skill is a fresh `output render --no-watermark` (250 credits per rendered minute); before running it, state the exact command and the summed clip length, ask once in words ("Clean render of 42 s of clips, about 175 credits, 12,400 left. Go ahead?") and wait for the answer, unless the user waived the question for the session (`credits.md`, "Waiving the question"), then run it once, with the billing line repeated in the Bash call's `description` (for example `Clean render of 42 s of clips (billed; 12,400 credits left)`).
 
 ## What to report
 
