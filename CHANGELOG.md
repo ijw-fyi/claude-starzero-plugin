@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.4.0
+
+- CLI pinned at 0.6.1: `starzero auth login` logs in through the browser and stores a 5-day token
+  in the OS credential store; `--no-browser` prints a URL and `--callback` finishes the login on
+  machines without a browser; `auth logout` revokes the token.
+- Setup logs the user in through the browser on every surface. No key is pasted into the chat and
+  no plugin option is asked for; the `api_key` option and the SessionStart hook are gone, so the
+  plugin ships no hooks. The skills call the launcher by path.
+- Every skill logs in again on exit 3, since a browser token expires; `auth.md` carries the one
+  procedure for both routes.
+- The launcher selects file mode (`STARZERO_KEYRING=0`) when a credentials file exists, so a login
+  on a machine without a keychain is found by every later command.
+- README section on what the plugin downloads, runs and contacts.
+
 ## 0.3.0
 
 - Confirmation before a billed command is a question in words, which the user can waive for the

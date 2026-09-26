@@ -10,8 +10,8 @@ Uploads the files the user names (`$ARGUMENTS`: files, or a folder to expand int
 
 ## Prerequisites
 
-- This skill runs the `starzero` CLI in the shell. The plugin puts it on PATH; when the bare name is not found, call the launcher by path, `${CLAUDE_PLUGIN_ROOT}/scripts/starzero`, which installs the CLI on first use. On claude.ai chat there is no shell, so this skill cannot run there.
-- Exit 3 from any command means the key is missing, invalid or lacks a scope: stop and ask the user to run `/starzero:setup`.
+- This skill runs the `starzero` CLI in the shell. Every `starzero ...` below is run as `${CLAUDE_PLUGIN_ROOT}/scripts/starzero ...`: that launcher installs the pinned CLI on first use and hands over to it. On claude.ai chat there is no shell, so this skill cannot run there.
+- Exit 3 from any command means the login has expired (browser logins last 5 days), or the credential is missing, invalid or lacks a scope. Log in again by the procedure in `${CLAUDE_PLUGIN_ROOT}/reference/auth.md` ("Logging in from a skill"), then re-run the command; when that fails, the user runs `/starzero:setup`.
 
 ## Steps
 
@@ -56,7 +56,7 @@ Uploads the files the user names (`$ARGUMENTS`: files, or a folder to expand int
 | exit 7 `UPLOAD_PARTIAL` | some files landed, some did not | re-run the same upload command; landed files are skipped |
 | a `failed` row with a media id | the server created the record, then the file failed | `media get <id>` first; it may be processing, and a re-run skips it by fingerprint |
 | exit 1 on upload | every attempted file failed | relay `message`, `hint` and `requestId` from stderr |
-| exit 3 during a batch | the batch aborted on an auth error | `/starzero:setup`, then re-run the same command |
+| exit 3 during a batch | the batch aborted on an auth error | log in again (`auth.md`), then re-run the same command |
 | `cooldown` events on stderr | a part hit a 500 or 503 and waits 30 s | the upload is working; wait |
 | exit 6 on `media watch` | still processing | run the resume command from the hint |
 | exit 7 `MEDIA_FAILED` / exit 1 on watch | some or all media `errored` | report which, from the status column; a retry happens in the StarZero app |

@@ -12,22 +12,22 @@ claude plugin marketplace add ijw-fyi/claude-starzero-plugin
 claude plugin install starzero@starzero
 ```
 
-Claude Code asks for your StarZero API key during install. Create one at
-https://app.starzero.ai/settings/api-keys with the scopes `profile:read`, `billing:read`,
-`library:read`, `library:search`, `rendering:read` and `rendering:write`. The key is stored by
-Claude Code outside your settings file and handed to the CLI; it appears in no transcript.
-
 Then, in a Claude Code session:
 
 ```
 /starzero:setup
 ```
 
-Setup downloads the CLI on first use (a ~40 MB verified download from GitHub releases), installs
-`ffprobe` next to it on Linux and Windows (about 100 to 200 MB, an LGPL build from
-[BtbN/FFmpeg-Builds](https://github.com/BtbN/FFmpeg-Builds)), checks your key and lists the scopes
-it carries. On macOS, install ffprobe with `brew install ffmpeg`; it is optional and only powers the
-credit estimate before uploads.
+Setup downloads the CLI on first use, installs `ffprobe` next to it on Linux and Windows, then logs
+you in: a browser tab opens on the StarZero login page, and the CLI stores the resulting token in
+your OS credential store. Nothing is pasted into the chat. A browser login lasts 5 days; any skill
+logs you in again when it has expired. On a machine without a browser, setup gives you a URL to
+open on any device and asks for the address the login ends on. An API key from
+https://app.starzero.ai/settings/api-keys works too (`starzero auth login --api-key`), for example
+in a cloud session where `STARZERO_API_KEY` is set as an environment variable.
+
+On macOS, install ffprobe with `brew install ffmpeg`; it is optional and only powers the credit
+estimate before uploads.
 
 ## What you can ask for
 
@@ -52,24 +52,30 @@ ahead. To skip the question, say so ("go ahead without asking") and it stays ski
 of the session; a line in your `CLAUDE.md` makes that permanent. Claude still tells you the cost
 before each billed command, and still asks about decisions that change what runs, such as
 starting a second run while one is active.
-Please keep the plugin's hooks enabled: `disableAllHooks` also removes the hook that puts the CLI
-on PATH.
 
-## Where things live
+## What the plugin downloads, runs and contacts
 
-- CLI and ffprobe: `~/.starzero/bin/<version>/` (or `$STARZERO_CONFIG_DIR/bin/<version>/`).
-- API key: written by the plugin to `~/.starzero/credentials` (mode 0600) from the option you set
-  at install (`/plugin configure starzero` opens that dialog again). Clear the option there to
-  manage the key yourself with `starzero auth login`.
-- The pinned CLI version is in `reference/CLI_VERSION`; a plugin update may move it.
+- The `starzero` CLI, about 40 MB, from
+  [ijw-fyi/starzero-cli-releases](https://github.com/ijw-fyi/starzero-cli-releases) on GitHub, at
+  the version pinned in `reference/CLI_VERSION`, verified against the release's `SHA256SUMS`
+  before it runs. It is stored in `~/.starzero/bin/<version>/` (or
+  `$STARZERO_CONFIG_DIR/bin/<version>/`). A plugin update may move the pin.
+- `ffprobe` on Linux and Windows, 100 to 200 MB, an LGPL build from
+  [BtbN/FFmpeg-Builds](https://github.com/BtbN/FFmpeg-Builds) verified against the publisher's
+  checksums, stored next to the CLI.
+- Hosts contacted: `github.com` and its release downloads for the two binaries; StarZero's own API
+  (`api.starzero.ai`) and app (`app.starzero.ai`) for everything the skills do. Your credential is
+  sent only to StarZero's API.
+- Your credential lives in the OS credential store (Credential Manager, Keychain, Secret Service),
+  or in `~/.starzero/credentials` (mode 0600) on a machine without one. `starzero auth logout`
+  removes it and revokes a browser login token.
+- The plugin has no hooks, no MCP server and no plugin options; everything runs through the CLI
+  from the skills.
 
 ## Other surfaces
 
-- **Cowork**: the plugin installs and the skills work when the session runs on your computer.
-  Cowork does not ask for plugin options, so `/starzero:setup` asks you to paste the key in the
-  chat and stores it in your OS credential store. The conversation keeps a copy; revoke the key
-  from the API keys page if that ever concerns you. Setting `STARZERO_API_KEY` in your environment
-  works too.
+- **Cowork**: the plugin installs and the skills work when the session runs on your computer;
+  the browser login works the same way there.
 - **Claude Code cloud sessions** (claude.ai/code): plugins are not loaded there. Install the CLI
   in the environment's setup script and set `STARZERO_API_KEY` as an environment variable or API
   credential; the CLI reads it first.
@@ -81,8 +87,7 @@ on PATH.
 ```sh
 claude --plugin-dir .          # load the working tree for one session
 claude plugin validate . --strict
-test/hooks.sh                  # session-start hook, no network
-test/launcher.sh               # downloads the pinned CLI into a temp HOME
+test/launcher.sh               # downloads the pinned CLI into a temp HOME; keyring selection
 scripts/check-versions.sh
 ```
 

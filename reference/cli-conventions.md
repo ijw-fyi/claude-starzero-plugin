@@ -42,7 +42,7 @@ Error, on stderr:
 | 0 | success | continue |
 | 1 | runtime or API error | read stderr; a cancelled run also ends here |
 | 2 | usage error | fix the flags; `--help` shows the accepted values |
-| 3 | no key, bad key, or missing scope | stop and run `/starzero:setup` |
+| 3 | login expired (browser tokens last 5 days), no credential, bad credential, or missing scope | log in again (`auth.md`), then re-run |
 | 4 | not found | check the id came from a list or view |
 | 5 | refused before sending anything (credits, storage, invalid variables) | report the numbers; nothing was billed; `starzero credits` shows the balance |
 | 6 | timeout: a watch gave up, or a request went unanswered | run the resume command from the hint; for `output render` the disconnect cancelled the render |

@@ -1,30 +1,30 @@
 ---
 name: setup
-description: 'Installs and authenticates the starzero CLI: downloads the pinned binary and ffprobe, checks the API key with auth status without printing it, explains how to supply a key, compares its scopes with the jobs the user wants, and shows the credit balance. Use when the user says "set up starzero", "log in to StarZero", "no API key", "how many credits do I have", "which scopes do I need", or after any starzero skill exits 3.'
+description: 'Installs and authenticates the starzero CLI: downloads the pinned binary and ffprobe, logs in through the browser (or an API key), checks the stored credential with auth status, compares its scopes with the jobs the user wants, and shows the credit balance. Use when the user says "set up starzero", "log in to StarZero", "my login expired", "no API key", "how many credits do I have", "which scopes do I need", or after any starzero skill exits 3.'
 disable-model-invocation: true
 ---
 
 # Setup
 
-Installs the pinned `starzero` CLI and ffprobe, then checks that an API key with the right scopes reaches the CLI. Every other skill in this plugin assumes these checks pass.
+Installs the pinned `starzero` CLI and ffprobe, logs the user in, then checks that a credential with the right scopes reaches the CLI. Every other skill in this plugin assumes these checks pass.
 
 ## Prerequisites
 
-- This skill runs the `starzero` CLI in the shell. The plugin puts it on PATH; when the bare name is not found, call the launcher by path, `${CLAUDE_PLUGIN_ROOT}/scripts/starzero`, which installs the CLI on first use. On claude.ai chat there is no shell, so this skill cannot run there.
-- Exit 3 from any command means the key is missing, invalid or lacks a scope: stop and ask the user to run `/starzero:setup`.
+- This skill runs the `starzero` CLI in the shell. Every `starzero ...` below is run as `${CLAUDE_PLUGIN_ROOT}/scripts/starzero ...`: that launcher installs the pinned CLI on first use and hands over to it. On claude.ai chat there is no shell, so this skill cannot run there.
+- Exit 3 from any command means the login has expired (browser logins last 5 days), or the credential is missing, invalid or lacks a scope. Log in again by the procedure in `${CLAUDE_PLUGIN_ROOT}/reference/auth.md` ("Logging in from a skill"), then re-run the command; when that fails, the user runs `/starzero:setup`.
 
 ## Steps
 
 1. Run `starzero --version`. The first run downloads the pinned CLI (the version in `${CLAUDE_PLUGIN_ROOT}/reference/CLI_VERSION`) from GitHub releases, verifies its SHA256 sum, then prints the version. A download failure prints the URL and an "offline?" hint; relay both.
 2. Run `${CLAUDE_PLUGIN_ROOT}/scripts/ensure-tools ffprobe`. On Linux and Windows this fetches a 100-200 MB LGPL build into the CLI's folder, verified against the publisher's checksums. On macOS it looks on PATH and prints `brew install ffmpeg` when absent, exit 0. ffprobe is optional: it powers the upload credit estimate and the non-media filter. Relay the one-line output.
-3. Run `starzero auth status`. Exit 0 prints `{ "source", "userId", "scopes" }`; go to step 5. Exit 3 means no usable key; go to step 4. Any other exit: relay `hint` from stderr.
-4. On exit 3, tell the user where a key comes from (https://app.starzero.ai/settings/api-keys, with the scopes listed in `auth.md`), then supply it by the route that fits where they are. Ask nothing about terminals or shells; the user may have never opened one.
-   - Claude Code: the plugin's "StarZero API key" option is the masked route and the first choice; `/plugin configure starzero` opens its dialog (it is a sensitive option, so `/config` leaves it out). The plugin's session hook writes it to the CLI's credentials file and exports `STARZERO_KEYRING=0`; the hook runs at session start, so ask the user to run `/clear` or start a new session afterwards, then re-check.
-   - Cowork, or Claude Code when the user prefers it: ask the user to paste the key in the chat. Store it with `starzero auth login --api-key <key>` (OS keychain: Credential Manager on Windows, Keychain on macOS, Secret Service on Linux); on `KEYCHAIN_UNAVAILABLE`, run the same command with `STARZERO_KEYRING=0` set, which writes `~/.starzero/credentials`. Then tell the user, once: the key is now stored on this machine and this conversation's history contains it; if that ever worries them, the API keys page is where to create a new key and revoke this one, after which they log in again with the new one.
-   - Cloud sessions: the user sets `STARZERO_API_KEY` in the environment's settings. It takes precedence over every stored key.
+3. Run `starzero auth status`. Exit 0 shows whose credential is stored, its type, scopes and expiry; relay that and go to step 5. Exit 3 means nothing usable is stored (or a browser token older than 5 days); go to step 4. Any other exit: relay `hint` from stderr.
+4. Log the user in by the procedure in `auth.md`, "Logging in from a skill". Ask nothing about terminals or shells; the user may have never opened one.
+   - With a browser on this machine (Claude Code on a desktop, Cowork): say a browser tab will open, run `starzero auth login` with the longest timeout the tool allows, and wait. The login page asks for every scope the CLI uses, so one login serves every skill.
+   - Without a browser here, or when no tab opened: `starzero auth login --no-browser` prints a URL for the user to open on any device; they paste back the address the login ended on, and `starzero auth login --callback "<address>"` finishes it.
+   - An API key when the user has one and prefers it: `starzero auth login --api-key <key>`; the user makes one at https://app.starzero.ai/settings/api-keys with the scopes in `auth.md`. A key typed into the chat stays in this conversation's history; say so once.
+   - Cloud sessions: the user sets `STARZERO_API_KEY` in the environment's settings. It takes precedence over every stored credential.
    Then re-run `starzero auth status`.
-   Plugin sessions read the credentials file whenever one exists and the keychain only when there is none; a user switching from the plugin option to a keychain login clears the option and removes `~/.starzero/credentials`.
-5. Ask which jobs the user plans (upload, search, workflows, podcast clips, chat, sharing renders) and compare `scopes` from step 3 with the jobs table in `auth.md`. A missing scope means a new key from the API keys page (`starzero auth login --help` prints the URL); scopes cannot be added to an existing key.
+5. When the credential is an API key: ask which jobs the user plans (upload, search, workflows, podcast clips, chat, sharing renders) and compare its scopes from step 3 with the jobs table in `auth.md`. A missing scope means a new key from the API keys page, since scopes cannot be added to an existing key, or a browser login, which carries them all. A browser token needs no scope check; mention its expiry date from step 3.
 6. Smoke test and balance: `starzero credits` (free, needs `billing:read`) shows `creditsLeft`, the plan and the credit notes with their expiries; relay them. `starzero library list` (free, `library:read`) confirms library access.
 
 ## Billing
@@ -33,7 +33,7 @@ Nothing in this skill spends credits. `--version`, `--help`, `auth status` and `
 
 ## Report back
 
-One line per check: CLI version; ffprobe (installed, found on PATH, or the brew hint); key `source` and `userId`; scopes present; scopes missing for the jobs named; credits left and plan; library access. The report repeats the key nowhere, even when the user pasted it earlier.
+One line per check: CLI version; ffprobe (installed, found on PATH, or the brew hint); who the credential belongs to, its type and expiry; scopes missing for the jobs named (API keys only); credits left and plan; library access. The report repeats no key, even when the user typed one earlier.
 
 ## Failure modes
 
@@ -41,12 +41,15 @@ One line per check: CLI version; ffprobe (installed, found on PATH, or the brew 
 | --- | --- | --- |
 | `starzero --version` fails after `ensure-tools starzero` | download blocked or the release is missing | relay the URL and hint; check network |
 | `ensure-tools ffprobe` reports a checksum mismatch twice | the publisher's daily rebuild was mid-swap | run it again later; uploads work without the estimate meanwhile |
-| exit 3 `AUTH` on `auth status` | nothing stored | step 4 |
-| exit 3 `AUTH` on `auth login` | key mistyped or revoked; nothing was stored | new key from the API keys page |
-| exit 3 `KEYCHAIN_UNAVAILABLE` | no OS keychain (headless Linux, containers, sandboxes) | `STARZERO_KEYRING=0` with the credentials file, or `STARZERO_API_KEY` |
+| exit 3 `AUTH` on `auth status` | nothing stored, or a browser token older than 5 days | step 4 |
+| `auth login` times out or is aborted | the user did not finish in the browser; nothing was stored | run it again |
+| `--callback` says no login is in progress, or the callback did not belong to this attempt | `--no-browser` was not run, ran over an hour ago, or the address is from an older URL | run `--no-browser` again and use its URL |
+| exit 3 `AUTH` on `auth login --api-key` | key mistyped or revoked; nothing was stored | new key from the API keys page |
+| exit 3 `KEYCHAIN_UNAVAILABLE` | no OS keychain (headless Linux, containers, sandboxes) | log in again with `STARZERO_KEYRING=0` set; the launcher then selects the file for later commands |
 | exit 3 `CREDENTIALS_INSECURE` | credentials file readable by others | `chmod 600 ~/.starzero/credentials` |
 | exit 3 on one command while `auth status` passes | the key lacks a scope for that command | new key with the scope |
 | `auth logout` warns `STARZERO_API_KEY` is still set | the environment variable keeps overriding the store | the user unsets it in their shell |
+| a skill exits 3 days after a working setup | the browser token expired (5 days) | step 4; any skill can run the login itself |
 
 ## Reference files
 
