@@ -1,7 +1,7 @@
 {
   "name": "starzero",
   "displayName": "StarZero",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Upload media to StarZero, search transcripts and visuals, run workflow templates, cut podcast clips and share renders through the starzero CLI.",
   "author": {
     "name": "StarZero",
@@ -23,14 +23,5 @@
     "workflow",
     "podcast",
     "clips"
-  ],
-  "userConfig": {
-    "api_key": {
-      "type": "string",
-      "title": "StarZero API key",
-      "description": "Create a key at https://app.starzero.ai/settings/api-keys with the profile:read, billing:read, library:read, library:search, rendering:read and rendering:write scopes, then paste it here. Claude Code stores it securely, outside your settings file.",
-      "sensitive": true,
-      "required": false
-    }
-  }
+  ]
 }
