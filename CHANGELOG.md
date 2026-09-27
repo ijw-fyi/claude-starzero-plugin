@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.1
+
+- Chat skill: what the StarZero agent can make, beyond cuts of library footage: deep analysis
+  across a whole library, generated video, animated graphics, voiceover, music, sound effects,
+  images, captions and reports, with its limits. Through the CLI these run on a brief alone, since
+  chats open with the gated tools pre-approved.
+
 ## 0.4.0
 
 - CLI pinned at 0.6.1: `starzero auth login` logs in through the browser and stores a 5-day token

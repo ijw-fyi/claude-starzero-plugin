@@ -32,4 +32,4 @@ Neither URL contains the API key, so both are safe to paste.
 - Render ids come from a view in this session. An id from memory or from the user's typing is the usual reason a link fails with a 404.
 - `outputs 0/n` on an instance view means the run is not finished or its branches failed; go back to `waiting.md` before asking for links.
 - A UUID row in `chat renders` is a legacy video the CLI cannot serve; the user opens that one in the app.
-- Artifacts are not renders. `artifact url <type>/<id>` gives a presigned URL for a file a chat used or produced (an uploaded image, a document, a `video` artifact); a render is the compiled output. Use `chat renders` for the videos and `artifact list --chat <id>` for everything else.
+- Artifacts are not renders. `artifact url <type>/<id>` gives a presigned URL for a file a chat used or produced: an uploaded image or document, and the generated pieces (`gen-video`, `gen-image`, `gen-tts`, `gen-music`, `gen-sfx`, `svg`); a render is the compiled output. Use `chat renders` for the videos and `artifact list --chat <id>` for everything else.
