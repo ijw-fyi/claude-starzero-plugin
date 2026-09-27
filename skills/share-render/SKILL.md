@@ -10,7 +10,7 @@ Hands a StarZero render over as a link: a public share page for sending, or a si
 
 ## Prerequisites
 
-- This skill runs the `starzero` CLI in the shell. Every `starzero ...` below is run as `${CLAUDE_PLUGIN_ROOT}/scripts/starzero ...`: that launcher installs the pinned CLI on first use and hands over to it. On claude.ai chat there is no shell, so this skill cannot run there.
+- This skill runs the `starzero` CLI in the shell. Every `starzero ...` below is run as `${CLAUDE_PLUGIN_ROOT}/scripts/starzero ...`: that launcher installs the pinned CLI on first use and hands over to it. Without a shell (claude.ai chat), the plugin's StarZero connector offers the same API as tools and carries its own instructions; the commands in this skill apply where a shell exists.
 - Exit 3 from any command means the login has expired (browser logins last 5 days), or the credential is missing, invalid or lacks a scope. Log in again by the procedure in `${CLAUDE_PLUGIN_ROOT}/reference/auth.md` ("Logging in from a skill"), then re-run the command; when that fails, the user runs `/starzero:setup`.
 
 ## Steps
@@ -54,7 +54,7 @@ Hands a StarZero render over as a link: a public share page for sending, or a si
 | exit 7 on `instance watch` | some branches failed | report which failed from the sessions table and their chat links before asking for links |
 | UUID row in `chat renders` | a legacy video the CLI cannot serve; `output url` rejects it | the user opens it in the app |
 | exit 4 on `instance get` or `chat renders` | the instance or chat id is mistyped | take the id from `instance list`, `podcast-clips list` or `chat list` |
-| exit 6 on `output render` | the render was cancelled by the disconnect | run the command again with a longer `--timeout`; the prompt again when it carries `--no-watermark` |
+| exit 6 on `output render` | a `--timeout` ended the wait and cancelled the render | run the command again without `--timeout`, in the background; the prompt again when it carries `--no-watermark` |
 
 ## Reference files
 

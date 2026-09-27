@@ -10,7 +10,7 @@ Searches a library for `$ARGUMENTS` in the spoken words or on screen and returns
 
 ## Prerequisites
 
-- This skill runs the `starzero` CLI in the shell. Every `starzero ...` below is run as `${CLAUDE_PLUGIN_ROOT}/scripts/starzero ...`: that launcher installs the pinned CLI on first use and hands over to it. On claude.ai chat there is no shell, so this skill cannot run there.
+- This skill runs the `starzero` CLI in the shell. Every `starzero ...` below is run as `${CLAUDE_PLUGIN_ROOT}/scripts/starzero ...`: that launcher installs the pinned CLI on first use and hands over to it. Without a shell (claude.ai chat), the plugin's StarZero connector offers the same API as tools and carries its own instructions; the commands in this skill apply where a shell exists.
 - Exit 3 from any command means the login has expired (browser logins last 5 days), or the credential is missing, invalid or lacks a scope. Log in again by the procedure in `${CLAUDE_PLUGIN_ROOT}/reference/auth.md` ("Logging in from a skill"), then re-run the command; when that fails, the user runs `/starzero:setup`.
 
 ## Steps
@@ -26,7 +26,7 @@ Searches a library for `$ARGUMENTS` in the spoken words or on screen and returns
    - A frame: `starzero media thumbnail --library <id> --at <seconds> [--height <px>] [--out <path>] <mediaId>`. Default name `<mediaId>-<seconds>s.jpg`.
    - A link: `starzero media url --library <id> [--which original|thumbnail|audio|audio-vocals|audio-background] <mediaId>`. The URL carries no key; pass it through as printed.
    - A file: `starzero media download --library <id> [--which ...] [--out <path>] <mediaId>`. Default name is the original filename in the current directory.
-   - One preview video of the hits: `starzero output render --library <id> --clip <mediaId>:<start>-<end> [--clip ...] [--aspect 9:16] [--height <px>] --timeout <seconds>`. Clips play in the order given; seconds take decimals. Watermarked by default and free. The command blocks until the render is done with no limit of its own, and exit 6 cancels it, so keep compilations short and set `--timeout` below the shell's limit so the CLI ends the wait rather than the shell. The result is `url`, `durationSeconds` and `urlExpiresInSeconds`; save it with `curl -o <file> "<url>"` while the URL is valid (about a day). A temporary render has no record: the URL is the whole result, and `output url` and `output share` cannot serve it.
+   - One preview video of the hits: `starzero output render --library <id> --clip <mediaId>:<start>-<end> [--clip ...] [--aspect 9:16] [--height <px>]`. Clips play in the order given; seconds take decimals. Watermarked by default and free. The command blocks until the render is done with no limit of its own, so run it in the background as `${CLAUDE_PLUGIN_ROOT}/reference/waiting.md` describes; `--timeout <seconds>` (exit 6, which cancels the render) is for headless runs only. The result is `url`, `durationSeconds` and `urlExpiresInSeconds`; save it with `curl -o <file> "<url>"` while the URL is valid (about a day). A temporary render has no record: the URL is the whole result, and `output url` and `output share` cannot serve it.
 6. `--no-watermark` on `output render` gives a clean render and bills credits: see the section below.
 
 See `starzero <group> <command> --help` for the remaining flags.
@@ -59,7 +59,7 @@ Every other command in this skill is free, with the search caveat above.
 | exit 8 `FILE_EXISTS` on `download` / `thumbnail` | the local file exists | choose another `--out`, or ask before `--force` |
 | `--which audio-vocals` or `audio-background` fails | speech separation has not been run on this media | use `--which audio` or `original` |
 | exit 1 with an API code such as `NO_ACCESS_TO_LIBRARY` | the key cannot see that library; this is an API refusal, not exit 3 | pick a library from `library list` |
-| exit 6 on `output render` | the wait ended and the render was cancelled | re-run with fewer clips or a longer `--timeout`; a clean render needs a fresh yes |
+| exit 6 on `output render` | a `--timeout` ended the wait and cancelled the render | re-run without `--timeout`, in the background; a clean render needs a fresh yes |
 | `media list` slow | the whole library is fetched per call | filter with `--folder`, `--name`, `--status` before paging |
 | `curl -o` returns 404 or 403 | the signed URL expired | run `media url` or `output render` again |
 

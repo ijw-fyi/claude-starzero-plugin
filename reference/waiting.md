@@ -8,7 +8,7 @@ Processing, workflow runs and podcast runs take minutes. The CLI offers a `watch
 - `workflow instance watch <instanceId>`: polls every 30 s. Podcast runs are watched with the same command.
 - Neither has a default limit: a watch runs until the server finishes unless `--timeout <seconds>` caps it.
 - Both are silent until done. `--progress` on an instance watch prints one stderr line per poll (`[m:ss] status  credits N  sessions a/b settled  outputs x/y`); `--events` on a media watch prints one NDJSON status change per line to stderr.
-- Pass `--timeout` below the limit of the shell you run in (the Bash tool allows at most 600 s per call), so the CLI ends the wait itself with exit 6 and a resume hint instead of being killed mid-poll; a long run is several watches in a row.
+- Leave `--timeout` off and run the watch in the background where the shell tool offers it: Claude Code's Bash tool does, and moves a foreground command there when its own time is up instead of stopping it, then reports when the command ends. The CLI then ends when the server does. Where background commands end with the turn (headless `claude -p` runs), cap `--timeout` under the tool's limit so the CLI ends the wait with exit 6 and a resume hint; a long run is then several watches in a row.
 
 ## Terminal states
 
@@ -31,4 +31,4 @@ A `create` that already returned an instance id has started billing. On 6, 7, 13
 
 ## `chat send` waits differently
 
-`chat send` streams the agent's turn instead of polling: it prints text, a tool digest every 30 s and questions as they arrive, with a two-minute idle timeout and no overall cap unless `--timeout <seconds>` is given. A turn can take many minutes, so leave the cap off and give the Bash call the longest timeout the tool allows; `--tools` (every tool call with its arguments) stays off unless a turn needs diagnosing. Exit 6, or a cut-off Bash call, means the turn is still running; `chat get <chatId>` shows `processing` until it settles, then the transcript. Send the next message only after `processing` is false.
+`chat send` streams the agent's turn instead of polling: it prints text, a tool digest every 30 s and questions as they arrive, with a two-minute idle timeout and no overall cap unless `--timeout <seconds>` is given. A turn can take many minutes, so leave the cap off and run the call in the background, reading its output when it ends; `--tools` (every tool call with its arguments) stays off unless a turn needs diagnosing. Exit 6, or a call that ended before the footer, means the turn is still running; `chat get <chatId>` shows `processing` until it settles, then the transcript. Send the next message only after `processing` is false.

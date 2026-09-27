@@ -1,9 +1,11 @@
 # StarZero plugin for Claude Code
 
 Upload media to StarZero, search transcripts and what is on screen, run workflow templates, cut
-podcast clips, chat with the StarZero agent and share renders, from Claude Code and Cowork. The
-plugin drives the [`starzero` command-line tool](https://github.com/ijw-fyi/starzero-cli-releases)
-and installs it for you.
+podcast clips, chat with the StarZero agent and share renders, from Claude Code, Cowork and
+claude.ai chat. Where there is a shell, the plugin drives the
+[`starzero` command-line tool](https://github.com/ijw-fyi/starzero-cli-releases) and installs it
+for you; on claude.ai chat it offers the StarZero connector, a remote MCP server with the same
+API as tools.
 
 ## Install
 
@@ -64,23 +66,40 @@ starting a second run while one is active.
   [BtbN/FFmpeg-Builds](https://github.com/BtbN/FFmpeg-Builds) verified against the publisher's
   checksums, stored next to the CLI.
 - Hosts contacted: `github.com` and its release downloads for the two binaries; StarZero's own API
-  (`api.starzero.ai`) and app (`app.starzero.ai`) for everything the skills do. Your credential is
-  sent only to StarZero's API.
+  (`api.starzero.ai`) and app (`app.starzero.ai`) for everything the skills do; `mcp.starzero.ai`
+  only where the connector is used. Your credential is sent only to StarZero.
 - Your credential lives in the OS credential store (Credential Manager, Keychain, Secret Service),
   or in `~/.starzero/credentials` (mode 0600) on a machine without one. `starzero auth logout`
   removes it and revokes a browser login token.
-- The plugin has no hooks, no MCP server and no plugin options; everything runs through the CLI
-  from the skills.
+- The plugin has no hooks and no plugin options. It bundles one remote MCP server, the StarZero
+  connector at `https://mcp.starzero.ai/mcp`, described below; nothing runs locally besides the CLI.
+
+## The StarZero connector
+
+The plugin bundles StarZero's remote MCP server as a connector. It exposes the same API as tools
+(libraries, media, search, workflows, podcast clips, renders, chats, artifacts), signs you in
+through your browser when you connect it, and carries its own instructions for the model. It is
+the route for claude.ai chat, where there is no shell.
+
+One login per surface: with a shell, the skills use the CLI and its login, and the connector stays
+disconnected. Claude Code lists it under `/mcp` as `plugin:starzero:starzero` with "needs
+authentication"; that is expected, and connecting it there is harmless but gives you a second
+login to the same account. On claude.ai chat, connect it from the plugin's Connectors tab.
+
+The same server is also listed on its own in the claude.ai directory. When your account already
+has that connector, Claude Code hides the plugin's copy rather than loading the same tools twice.
+On claude.ai chat, if both appear, connect one; both carry the same tools.
 
 ## Other surfaces
 
 - **Cowork**: the plugin installs and the skills work when the session runs on your computer;
-  the browser login works the same way there.
+  the browser login works the same way there. The connector shows on the plugin's Connectors tab
+  and is not needed.
 - **Claude Code cloud sessions** (claude.ai/code): plugins are not loaded there. Install the CLI
   in the environment's setup script and set `STARZERO_API_KEY` as an environment variable or API
   credential; the CLI reads it first.
-- **claude.ai chat**: the plugin installs but has no shell to run the CLI, so the skills cannot
-  act there.
+- **claude.ai chat**: no shell, so the skills' commands cannot run; the StarZero connector is
+  the route, and the model follows the connector's instructions there.
 
 ## Development
 

@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.5.0
+
+- The StarZero connector, StarZero's remote MCP server at `https://mcp.starzero.ai/mcp`, is
+  bundled in `.mcp.json`. It is the route on claude.ai chat, where there is no shell. Routing is by
+  surface: with a shell the skills use the CLI and the connector stays disconnected, so each
+  session has one login; without one the connector's own instructions carry the procedure. Setup
+  says so on both routes.
+- Long commands (`chat send`, the watches, `output render`, `auth login`) run in the background
+  instead of under a `--timeout` sized to the Bash tool's limit: Claude Code moves a command that
+  outlives its timeout to the background rather than stopping it. `--timeout` stays for headless
+  runs, where background commands end with the turn.
+
 ## 0.4.1
 
 - Chat skill: what the StarZero agent can make, beyond cuts of library footage: deep analysis
