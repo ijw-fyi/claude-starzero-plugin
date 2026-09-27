@@ -24,7 +24,7 @@ In order:
 **With a browser on this machine** (Claude Code on a desktop, Cowork):
 
 1. Tell the user a browser tab will open and that the command waits for them to finish there.
-2. Run `starzero auth login` with the longest timeout the shell tool allows (600000 ms in Claude Code). Where the tool can run a command in the background, do that instead and relay the URL from its output right away, for the case where no tab opened.
+2. Run `starzero auth login` in the background where the shell tool offers it (Claude Code's Bash tool does) and relay the URL from its output right away, for the case where no tab opened.
 3. Exit 0 means the token is stored; confirm with `starzero auth status`. A timed-out or aborted call stored nothing; run it again.
 
 **Without a browser on this machine** (containers, remote hosts, a desktop where no tab opened):

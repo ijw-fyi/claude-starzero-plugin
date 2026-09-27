@@ -10,7 +10,7 @@ Uploads the files the user names (`$ARGUMENTS`: files, or a folder to expand int
 
 ## Prerequisites
 
-- This skill runs the `starzero` CLI in the shell. Every `starzero ...` below is run as `${CLAUDE_PLUGIN_ROOT}/scripts/starzero ...`: that launcher installs the pinned CLI on first use and hands over to it. On claude.ai chat there is no shell, so this skill cannot run there.
+- This skill runs the `starzero` CLI in the shell. Every `starzero ...` below is run as `${CLAUDE_PLUGIN_ROOT}/scripts/starzero ...`: that launcher installs the pinned CLI on first use and hands over to it. Without a shell (claude.ai chat), the plugin's StarZero connector offers the same API as tools and carries its own instructions; the commands in this skill apply where a shell exists.
 - Exit 3 from any command means the login has expired (browser logins last 5 days), or the credential is missing, invalid or lacks a scope. Log in again by the procedure in `${CLAUDE_PLUGIN_ROOT}/reference/auth.md` ("Logging in from a skill"), then re-run the command; when that fails, the user runs `/starzero:setup`.
 
 ## Steps
@@ -21,7 +21,7 @@ Uploads the files the user names (`$ARGUMENTS`: files, or a folder to expand int
 4. Plan with `starzero media upload --library <id> [--folder /path] --dry-run <files...>`. Nothing is sent. Report: one row per file (`planned`, `already-uploaded` with the existing media id and status, `skipped` as `too-small` or `non-media`), the `warnings` (several streams, more than two audio channels, more than 10 hours), and the plan line `~N credits (M left)`. Without ffprobe the estimate is skipped with a warning; say the upload is unestimated. Exit 5 means the estimate exceeds the credits or storage left; report the numbers and stop.
 5. State the billing, per the section below.
 6. Upload with the same command without `--dry-run` and without `--watch`: `starzero media upload --library <id> [--folder /path] <files...>`. Add `--name "<display name>"` only for a single file, `--meta key=value` for metadata. Read the exit code before the output. Take the new media ids from the rows and the exact `media watch` command from `next.watch`.
-7. Watch with the command from `next.watch`, adding `--timeout <seconds>` set below the shell's own limit (the watch has no limit of its own; the Bash tool's timeout is the ceiling, so let the CLI end the wait with exit 6 and a resume hint). Processing takes minutes even for short clips. The watch is silent until done; `--events` prints one status change per line on stderr when the user wants a heartbeat. Exit 6 means processing continues: run the resume command from the hint, which is the same watch again.
+7. Watch with the command from `next.watch`, in the background, as `${CLAUDE_PLUGIN_ROOT}/reference/waiting.md` describes (the watch has no limit of its own). Processing takes minutes even for short clips. The watch is silent until done; `--events` prints one status change per line on stderr when the user wants a heartbeat. Exit 6 means processing continues: run the resume command from the hint, which is the same watch again.
 8. Confirm with `starzero media list --library <id> [--folder /path] --status completed` and check every new id is present.
 
 ## Billing

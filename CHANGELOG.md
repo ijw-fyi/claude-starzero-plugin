@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.5.0
+
+- The StarZero connector, StarZero's remote MCP server at `https://mcp.starzero.ai/mcp`, is
+  bundled in `.mcp.json`. It is the route on claude.ai chat, where there is no shell. Routing is by
+  surface: with a shell the skills use the CLI and the connector stays disconnected, so each
+  session has one login; without one the connector's own instructions carry the procedure. Setup
+  says so on both routes.
+- Long commands (`chat send`, the watches, `output render`, `auth login`) run in the background,
+  with no cap set by the skills.
+- CLI pinned at 0.7.0: a crash of the CLI is reported to StarZero's Sentry project with the event
+  id printed (README says what is sent and how to turn it off; `cli-conventions.md` carries the
+  `reported` and `eventId` fields); the `chat send` footer and JSON summary carry the chat's
+  context size after the turn.
+
 ## 0.4.1
 
 - Chat skill: what the StarZero agent can make, beyond cuts of library footage: deep analysis

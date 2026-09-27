@@ -10,7 +10,7 @@ Starts one run of an existing StarZero workflow template on a library or a chose
 
 ## Prerequisites
 
-- This skill runs the `starzero` CLI in the shell. Every `starzero ...` below is run as `${CLAUDE_PLUGIN_ROOT}/scripts/starzero ...`: that launcher installs the pinned CLI on first use and hands over to it. On claude.ai chat there is no shell, so this skill cannot run there.
+- This skill runs the `starzero` CLI in the shell. Every `starzero ...` below is run as `${CLAUDE_PLUGIN_ROOT}/scripts/starzero ...`: that launcher installs the pinned CLI on first use and hands over to it. Without a shell (claude.ai chat), the plugin's StarZero connector offers the same API as tools and carries its own instructions; the commands in this skill apply where a shell exists.
 - Exit 3 from any command means the login has expired (browser logins last 5 days), or the credential is missing, invalid or lacks a scope. Log in again by the procedure in `${CLAUDE_PLUGIN_ROOT}/reference/auth.md` ("Logging in from a skill"), then re-run the command; when that fails, the user runs `/starzero:setup`.
 
 ## Steps
@@ -21,7 +21,7 @@ Starts one run of an existing StarZero workflow template on a library or a chose
 4. Choose the media. `starzero media list --library <libraryId> --status completed` and take `--media <id...>` from it; omit `--media` to run on the whole library. Count the items: fan-out templates bill per item. Several media go into one instance; one instance per media item is the wrong shape.
 5. Check for an active run before starting one. Runs draw on the shared credit balance as they go, so two runs in flight can both fail from credit exhaustion where one alone would have finished, and spent credits stay spent. Podcast-clip runs are workflow instances too, so they count. Run `starzero workflow instance list --status queued` and `starzero workflow instance list --status pending`; any row means a run is active. Finish it first: watch it to completion with `starzero workflow instance watch <instanceId>` (or let the user cancel it), then start the new one. When the user insists on a parallel run, say what can happen and go with their answer.
 6. State the billing (next section), then start the run once: `starzero workflow instance create --template <templateId> --library <libraryId> [--media <id...>] --variables vars.json [--name <name>]`, without `--watch`. Read the exit code first, then `warnings` (`variables were not validated` means the run started anyway) and `next.watch`.
-7. Watch as a separate command. Read `${CLAUDE_PLUGIN_ROOT}/reference/waiting.md` before the first watch. Run the `next.watch` command, `starzero workflow instance watch <instanceId> --timeout <seconds>`, with `--timeout` below the Bash tool's limit (at most 600 s); a long run is several watches in a row, each started with the resume command the CLI printed on exit 6. Add `--progress` when the user wants one status line per poll on stderr.
+7. Watch as a separate command. Read `${CLAUDE_PLUGIN_ROOT}/reference/waiting.md` before the first watch. Run the `next.watch` command, `starzero workflow instance watch <instanceId>`, in the background, as `waiting.md` describes. Add `--progress` when the user wants one status line per poll on stderr.
 8. Final view: `starzero workflow instance get <instanceId>`. Read `${CLAUDE_PLUGIN_ROOT}/reference/renders.md` before handing back links, then run the `next.url` or `next.share` command as printed, or hand over to `/starzero:share-render`.
 9. On the user's request only: `starzero workflow instance cancel <instanceId>` stops a run; credits already spent stay spent. `starzero workflow instance list --template <templateId> --status <status>` answers "what have I run" and "is my run finished".
 
@@ -51,7 +51,7 @@ From the `get` view: status, `creditsUsed`, the app link as printed, the session
 | 2 | a flag or id shape was rejected, or the `--variables` file is unreadable | fix the flags; `--help` shows the accepted values |
 | 7 `INSTANCE_PARTIAL` on watch | some branches failed; the view is on stdout | list the failed sessions with their chat links; a rerun is a separate decision for the user |
 | 1 `INSTANCE_FAILED` or `INSTANCE_CANCELLED` | everything failed or the run was cancelled | show `error` from the view; a rerun is a new billed run |
-| 6 on watch | timeout; the run continues server-side | run the resume command from the hint |
+| 6 on watch | the wait ended early; the run continues server-side | run the resume command from the hint |
 | 130 | interrupted; the run continues | print the resume and cancel commands the CLI gave and let the user choose |
 | `cancel` on an unknown id | exit 1, not 4 | check the id against `instance list` |
 | 3 | login expired (5 days), or credential missing, invalid or lacking a scope | log in again (`auth.md`), then re-run |
