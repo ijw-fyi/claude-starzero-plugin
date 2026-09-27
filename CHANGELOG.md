@@ -4,13 +4,12 @@
 
 - CLI pinned at 0.8.0: the credential lives in `~/.starzero/credentials` (mode 0600) on every
   platform; the OS keychain is no longer used, which ends the macOS password prompt on every
-  command. A login made with an earlier CLI is not read: the first `starzero` command after this
-  update exits 3 and any skill logs you in again, once. The README says how to delete the old
+  command. A login made with an earlier CLI is not read: the first command that needs the login
+  after this update exits 3 and any skill logs you in again, once. The README says how to delete the old
   keychain item by hand.
 - The launcher no longer sets `STARZERO_KEYRING`; the CLI ignores it. `KEYCHAIN_UNAVAILABLE` is
   gone from the skills and `auth.md`.
 - The marketplace description matches the plugin's, and `scripts/check-versions.sh` checks it.
-- README: connecting the bundled connector from Cowork works and is optional.
 
 ## 0.5.0
 

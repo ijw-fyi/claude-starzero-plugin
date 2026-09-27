@@ -22,7 +22,7 @@ Then, in a Claude Code session:
 
 Setup downloads the CLI on first use, installs `ffprobe` next to it on Linux and Windows, then logs
 you in: a browser tab opens on the StarZero login page, and the CLI stores the resulting token in
-`~/.starzero/credentials`, readable by you alone. Nothing is pasted into the chat. A browser login lasts 5 days; any skill
+`~/.starzero/credentials`, owner-only. Nothing is pasted into the chat. A browser login lasts 5 days; any skill
 logs you in again when it has expired. On a machine without a browser, setup gives you a URL to
 open on any device and asks for the address the login ends on. An API key from
 https://app.starzero.ai/settings/api-keys works too (`starzero auth login --api-key`), for example
@@ -103,8 +103,8 @@ On claude.ai chat, if both appear, connect one; both carry the same tools.
 ## Other surfaces
 
 - **Cowork**: the plugin installs and the skills work when the session runs on your computer;
-  the browser login works the same way there. The connector shows on the plugin's Connectors tab;
-  connecting it works and is optional, since the skills use the CLI.
+  the browser login works the same way there. The connector shows on the plugin's Connectors tab
+  and is optional, since the skills use the CLI.
 - **Claude Code cloud sessions** (claude.ai/code): plugins are not loaded there. Install the CLI
   in the environment's setup script and set `STARZERO_API_KEY` as an environment variable or API
   credential; the CLI reads it first.
