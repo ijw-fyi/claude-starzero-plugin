@@ -32,6 +32,8 @@ Error, on stderr:
 { "ok": false, "code": "AUTH", "message": "...", "exitCode": 3, "hint": "...", "httpStatus": 401, "requestId": "..." }
 ```
 
+An `INTERNAL` error adds `"reported": true` and `"eventId": "..."` when the CLI sent a crash report.
+
 - `hint` is the recovery step in the CLI's own words. Relay it.
 - `requestId` is what StarZero support needs for an API error. Include it when reporting a failure.
 
@@ -40,7 +42,7 @@ Error, on stderr:
 | Code | Meaning | What to do |
 | --- | --- | --- |
 | 0 | success | continue |
-| 1 | runtime or API error | read stderr; a cancelled run also ends here |
+| 1 | runtime or API error | read stderr; a cancelled run also ends here. `INTERNAL` is a bug in the CLI, reported by the CLI itself: relay the message and the event id; a re-run rarely helps |
 | 2 | usage error | fix the flags; `--help` shows the accepted values |
 | 3 | login expired (browser tokens last 5 days), no credential, bad credential, or missing scope | log in again (`auth.md`), then re-run |
 | 4 | not found | check the id came from a list or view |
@@ -56,7 +58,7 @@ Usage errors come in two forms: a rejected flag prints a plain `error: ...` line
 
 ## Two commands behave differently
 
-- `chat send` streams the reply as text and ends with a `[done in m:ss · N tool calls · C credits]` footer; with `--json` it becomes one NDJSON event per tool call plus a summary line, which is more tokens for the same information. Stay in human mode unless piping.
+- `chat send` streams the reply as text and ends with a `[done in m:ss · N tool calls · C credits · N tokens in context]` footer (the JSON summary line carries the same as `context`); with `--json` it becomes one NDJSON event per tool call plus a summary line, which is more tokens for the same information. Stay in human mode unless piping.
 - `media upload --events` and `media watch --events` write NDJSON progress to stderr; `workflow instance watch --progress` writes plain lines to stderr. Stdout stays one document.
 
 ## Shapes worth knowing

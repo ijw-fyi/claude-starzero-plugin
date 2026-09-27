@@ -9,6 +9,10 @@
   says so on both routes.
 - Long commands (`chat send`, the watches, `output render`, `auth login`) run in the background,
   with no cap set by the skills.
+- CLI pinned at 0.7.0: a crash of the CLI is reported to StarZero's Sentry project with the event
+  id printed (README says what is sent and how to turn it off; `cli-conventions.md` carries the
+  `reported` and `eventId` fields); the `chat send` footer and JSON summary carry the chat's
+  context size after the turn.
 
 ## 0.4.1
 

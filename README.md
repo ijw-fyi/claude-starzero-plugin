@@ -68,6 +68,11 @@ starting a second run while one is active.
 - Hosts contacted: `github.com` and its release downloads for the two binaries; StarZero's own API
   (`api.starzero.ai`) and app (`app.starzero.ai`) for everything the skills do; `mcp.starzero.ai`
   only where the connector is used. Your credential is sent only to StarZero.
+- On a crash of the CLI itself (an `INTERNAL` error, a bug), the CLI sends one report to StarZero's
+  Sentry project (`ingest.us.sentry.io`): the error message, the command name, the CLI version,
+  the platform and which kind of credential was in use; never your arguments, files, keys or
+  tokens. It prints the report's event id. `DO_NOT_TRACK=1` or an empty `STARZERO_SENTRY_DSN=`
+  in your environment turns it off.
 - Your credential lives in the OS credential store (Credential Manager, Keychain, Secret Service),
   or in `~/.starzero/credentials` (mode 0600) on a machine without one. `starzero auth logout`
   removes it and revokes a browser login token. The connector's sign-in token is separate and
