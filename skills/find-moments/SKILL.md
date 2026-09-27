@@ -26,7 +26,7 @@ Searches a library for `$ARGUMENTS` in the spoken words or on screen and returns
    - A frame: `starzero media thumbnail --library <id> --at <seconds> [--height <px>] [--out <path>] <mediaId>`. Default name `<mediaId>-<seconds>s.jpg`.
    - A link: `starzero media url --library <id> [--which original|thumbnail|audio|audio-vocals|audio-background] <mediaId>`. The URL carries no key; pass it through as printed.
    - A file: `starzero media download --library <id> [--which ...] [--out <path>] <mediaId>`. Default name is the original filename in the current directory.
-   - One preview video of the hits: `starzero output render --library <id> --clip <mediaId>:<start>-<end> [--clip ...] [--aspect 9:16] [--height <px>]`. Clips play in the order given; seconds take decimals. Watermarked by default and free. The command blocks until the render is done with no limit of its own, so run it in the background as `${CLAUDE_PLUGIN_ROOT}/reference/waiting.md` describes; `--timeout <seconds>` ends the wait with exit 6 and cancels the render, so it stays off. The result is `url`, `durationSeconds` and `urlExpiresInSeconds`; save it with `curl -o <file> "<url>"` while the URL is valid (about a day). A temporary render has no record: the URL is the whole result, and `output url` and `output share` cannot serve it.
+   - One preview video of the hits: `starzero output render --library <id> --clip <mediaId>:<start>-<end> [--clip ...] [--aspect 9:16] [--height <px>]`. Clips play in the order given; seconds take decimals. Watermarked by default and free. The command blocks until the render is done with no limit of its own, so run it in the background as `${CLAUDE_PLUGIN_ROOT}/reference/waiting.md` describes. The result is `url`, `durationSeconds` and `urlExpiresInSeconds`; save it with `curl -o <file> "<url>"` while the URL is valid (about a day). A temporary render has no record: the URL is the whole result, and `output url` and `output share` cannot serve it.
 6. `--no-watermark` on `output render` gives a clean render and bills credits: see the section below.
 
 See `starzero <group> <command> --help` for the remaining flags.
@@ -59,7 +59,7 @@ Every other command in this skill is free, with the search caveat above.
 | exit 8 `FILE_EXISTS` on `download` / `thumbnail` | the local file exists | choose another `--out`, or ask before `--force` |
 | `--which audio-vocals` or `audio-background` fails | speech separation has not been run on this media | use `--which audio` or `original` |
 | exit 1 with an API code such as `NO_ACCESS_TO_LIBRARY` | the key cannot see that library; this is an API refusal, not exit 3 | pick a library from `library list` |
-| exit 6 on `output render` | a `--timeout` ended the wait and cancelled the render | re-run without `--timeout`, in the background; a clean render needs a fresh yes |
+| exit 6 on `output render` | the wait ended early and the render was cancelled | re-run in the background; a clean render needs a fresh yes |
 | `media list` slow | the whole library is fetched per call | filter with `--folder`, `--name`, `--status` before paging |
 | `curl -o` returns 404 or 403 | the signed URL expired | run `media url` or `output render` again |
 

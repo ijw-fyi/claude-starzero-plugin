@@ -45,7 +45,7 @@ Error, on stderr:
 | 3 | login expired (browser tokens last 5 days), no credential, bad credential, or missing scope | log in again (`auth.md`), then re-run |
 | 4 | not found | check the id came from a list or view |
 | 5 | refused before sending anything (credits, storage, invalid variables) | report the numbers; nothing was billed; `starzero credits` shows the balance |
-| 6 | timeout: a watch gave up, or a request went unanswered | run the resume command from the hint; for `output render` the disconnect cancelled the render |
+| 6 | the wait ended early: a watch gave up, or a request went unanswered | run the resume command from the hint; for `output render` the disconnect cancelled the render |
 | 7 | partial success; details on stdout | inspect the status column or sessions table; retrying is a separate decision |
 | 8 | conflict (local file exists, server conflict) | choose another `--out`, or ask before `--force` |
 | 130 | interrupted | the run continues; the hint prints resume and cancel commands |

@@ -54,7 +54,7 @@ Hands a StarZero render over as a link: a public share page for sending, or a si
 | exit 7 on `instance watch` | some branches failed | report which failed from the sessions table and their chat links before asking for links |
 | UUID row in `chat renders` | a legacy video the CLI cannot serve; `output url` rejects it | the user opens it in the app |
 | exit 4 on `instance get` or `chat renders` | the instance or chat id is mistyped | take the id from `instance list`, `podcast-clips list` or `chat list` |
-| exit 6 on `output render` | a `--timeout` ended the wait and cancelled the render | run the command again without `--timeout`, in the background; the prompt again when it carries `--no-watermark` |
+| exit 6 on `output render` | the wait ended early and the render was cancelled | run the command again in the background; the prompt again when it carries `--no-watermark` |
 
 ## Reference files
 

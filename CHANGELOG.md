@@ -7,9 +7,8 @@
   surface: with a shell the skills use the CLI and the connector stays disconnected, so each
   session has one login; without one the connector's own instructions carry the procedure. Setup
   says so on both routes.
-- Long commands (`chat send`, the watches, `output render`, `auth login`) run in the background
-  instead of under a `--timeout` sized to the Bash tool's limit: Claude Code moves a command that
-  outlives its timeout to the background rather than stopping it, so `--timeout` stays off.
+- Long commands (`chat send`, the watches, `output render`, `auth login`) run in the background,
+  with no cap set by the skills.
 
 ## 0.4.1
 
