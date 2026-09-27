@@ -18,7 +18,7 @@ Installs the pinned `starzero` CLI and ffprobe, logs the user in, then checks th
 
 1. Run `starzero --version`. The first run downloads the pinned CLI (the version in `${CLAUDE_PLUGIN_ROOT}/reference/CLI_VERSION`) from GitHub releases, verifies its SHA256 sum, then prints the version. A download failure prints the URL and an "offline?" hint; relay both.
 2. Run `${CLAUDE_PLUGIN_ROOT}/scripts/ensure-tools ffprobe`. On Linux and Windows this fetches a 100-200 MB LGPL build into the CLI's folder, verified against the publisher's checksums. On macOS it looks on PATH and prints `brew install ffmpeg` when absent, exit 0. ffprobe is optional: it powers the upload credit estimate and the non-media filter. Relay the one-line output.
-3. Run `starzero auth status`. Exit 0 shows whose credential is stored, its type, scopes and expiry; relay that and go to step 5. Exit 3 means nothing usable is stored (or a browser token older than 5 days); go to step 4. Any other exit: relay `hint` from stderr.
+3. Run `starzero auth status`. Exit 0 shows whose credential is stored, its type, scopes and expiry; relay that and go to step 5. Exit 3 means nothing usable is stored: no login yet, a browser token older than 5 days, or a login made with a CLI before 0.8.0, which kept it in the OS keychain that the CLI no longer reads; go to step 4. Any other exit: relay `hint` from stderr.
 4. Log the user in by the procedure in `auth.md`, "Logging in from a skill". Ask nothing about terminals or shells; the user may have never opened one.
    - With a browser on this machine (Claude Code on a desktop, Cowork): say a browser tab will open, run `starzero auth login` in the background, relay the URL from its output when no tab opened, and continue once the command ends. The login page asks for every scope the CLI uses, so one login serves every skill.
    - Without a browser here, or when no tab opened: `starzero auth login --no-browser` prints a URL for the user to open on any device; they paste back the address the login ended on, and `starzero auth login --callback "<address>"` finishes it.
@@ -42,12 +42,11 @@ One line per check: CLI version; ffprobe (installed, found on PATH, or the brew 
 | --- | --- | --- |
 | `starzero --version` fails after `ensure-tools starzero` | download blocked or the release is missing | relay the URL and hint; check network |
 | `ensure-tools ffprobe` reports a checksum mismatch twice | the publisher's daily rebuild was mid-swap | run it again later; uploads work without the estimate meanwhile |
-| exit 3 `AUTH` on `auth status` | nothing stored, or a browser token older than 5 days | step 4 |
+| exit 3 `AUTH` on `auth status` | nothing stored, a browser token older than 5 days, or a login from a CLI before 0.8.0 | step 4; a login from before 0.8.0 is done once more |
 | `auth login` times out or is aborted | the user did not finish in the browser; nothing was stored | run it again |
 | `--callback` says no login is in progress, or the callback did not belong to this attempt | `--no-browser` was not run, ran over an hour ago, or the address is from an older URL | run `--no-browser` again and use its URL |
 | exit 3 `AUTH` on `auth login --api-key` | key mistyped or revoked; nothing was stored | new key from the API keys page |
-| exit 3 `KEYCHAIN_UNAVAILABLE` | no OS keychain (headless Linux, containers, sandboxes) | log in again with `STARZERO_KEYRING=0` set; the launcher then selects the file for later commands |
-| exit 3 `CREDENTIALS_INSECURE` | credentials file readable by others | `chmod 600 ~/.starzero/credentials` |
+| exit 3 `CREDENTIALS_INSECURE` | credentials file readable by others (macOS and Linux) | `chmod 600 ~/.starzero/credentials` |
 | exit 3 on one command while `auth status` passes | the key lacks a scope for that command | new key with the scope |
 | `auth logout` warns `STARZERO_API_KEY` is still set | the environment variable keeps overriding the store | the user unsets it in their shell |
 | a skill exits 3 days after a working setup | the browser token expired (5 days) | step 4; any skill can run the login itself |

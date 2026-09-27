@@ -15,13 +15,6 @@ esac
 # Installer output goes to stderr so `--json` callers keep a clean stdout.
 [ -x "$exe" ] || "$here/ensure-tools" starzero >&2
 
-# A credentials file (written by `auth login` under STARZERO_KEYRING=0 on a machine without a
-# keychain) is read only in file mode, so select that mode when the caller left the choice open.
-if [ -z "${STARZERO_KEYRING+set}" ] && [ -f "${STARZERO_CONFIG_DIR:-$HOME/.starzero}/credentials" ]; then
-  STARZERO_KEYRING=0
-  export STARZERO_KEYRING
-fi
-
 PATH="$tool_dir:$PATH"
 export PATH
 exec "$exe" "$@"
