@@ -70,9 +70,11 @@ starting a second run while one is active.
   only where the connector is used. Your credential is sent only to StarZero.
 - Your credential lives in the OS credential store (Credential Manager, Keychain, Secret Service),
   or in `~/.starzero/credentials` (mode 0600) on a machine without one. `starzero auth logout`
-  removes it and revokes a browser login token.
+  removes it and revokes a browser login token. The connector's sign-in token is separate and
+  lives where your MCP client keeps such tokens: Claude Code's credential store, or claude.ai for
+  chat; disconnecting the connector there ends it.
 - The plugin has no hooks and no plugin options. It bundles one remote MCP server, the StarZero
-  connector at `https://mcp.starzero.ai/mcp`, described below; nothing runs locally besides the CLI.
+  connector at `https://mcp.starzero.ai/mcp`, described below; no local MCP server.
 
 ## The StarZero connector
 
@@ -105,6 +107,7 @@ On claude.ai chat, if both appear, connect one; both carry the same tools.
 
 ```sh
 claude --plugin-dir .          # load the working tree for one session
+# Opening this repo in Claude Code also offers `.mcp.json` as a project MCP server; approve or skip it.
 claude plugin validate . --strict
 test/launcher.sh               # downloads the pinned CLI into a temp HOME; keyring selection
 scripts/check-versions.sh
