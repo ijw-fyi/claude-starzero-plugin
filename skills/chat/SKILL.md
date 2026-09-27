@@ -1,18 +1,34 @@
 ---
 name: chat
-description: 'Hands a task to the StarZero agent, an agentic system over a whole library: library-wide analysis, cross-media comparison, video editing and creation. One chat carries one task, however many media it touches. Creates or continues the chat, relays its questions, collects what it produced. Use when the user says "ask StarZero to", "analyse the whole library", "make a highlight reel" or "continue my chat".'
+description: 'Hands a task to the StarZero agent, an agentic system over a whole library: library-wide analysis, video editing, and generation of video, animated graphics, voiceover, music and images. One chat carries one task, however many media it touches. Creates or continues the chat, relays its questions, collects what it produced. Use when the user says "ask StarZero to", "analyse the whole library", "make a highlight reel", "make an animated video", "add a voiceover" or "continue my chat".'
 argument-hint: "[chat id or question]"
 ---
 
 # Chat with the StarZero agent
 
-Hands a task to the StarZero agent and relays the result. The agent is an agentic system with its own tools over the whole library: it reads every transcript, searches, compares media, cuts and renders videos, and asks questions when it needs a decision. It does the fan-out over media itself, inside one chat. Argument: `$ARGUMENTS` is a chat id to continue or the task to hand over.
+Hands a task to the StarZero agent and relays the result. The agent is an agentic system with its own tools over the whole library: it searches and analyses the media, cuts and renders videos, generates video, graphics, voiceover, music, sound effects and images, and asks questions when it needs a decision. It does the fan-out over media itself, inside one chat. Argument: `$ARGUMENTS` is a chat id to continue or the task to hand over.
+
+## What the agent can make
+
+Brief it like an editor with a studio, and name what you want made; it has more than cutting tools. Through the CLI, every tool runs without an in-app approval (the CLI opens chats with the gated tools pre-approved), so a brief that asks for generated footage or a library-wide scan gets it, billed as it goes.
+
+- **Edits from library footage**: compilation and summary videos, highlight reels, cutdowns that keep the narrative, product comparisons, vertical and square versions for social media. Aspect ratios 21:9, 16:9, 4:3, 3:2, 2:1, 1:1, 4:5, 5:4, 3:4, 2:3, 9:16 and their inverses; reframing that follows the speaker or a named object; split-screen layouts; clip speed 0.25x to 12x; crossfades between clips; blur or a solid colour behind clips that leave part of the frame empty.
+- **Animated graphics**: animated or static SVG title cards, lower-thirds, badges, icons and background animations, full-frame or partial, as overlays on footage or as clips of their own, with a timed animation plan and a reference image or SVG when the user has one.
+- **Generated video**: short AI clips from a text prompt, from one or two images, or by restyling, editing or extending a library clip; intro cards, b-roll cutaways, logo end-cards, retro ads. Each clip is 3 to 10 seconds, extendable to 40; 16:9 or 9:16 only. Nineteen restyle looks, from anime and pixel art to art deco and cyberpunk, tuned for a person on camera.
+- **Generated images**: thumbnails, posters, overlays, text and graphics composited onto a frame, up to 2K, from up to ten reference images or videos.
+- **Audio**: voiceover or narration from a script, one voice per pass, chosen by gender, age, use (narration, social media, advertisement), accent and language, with delivery markers for emotion, tone, laughter and pauses; music from a prompt, 3 seconds to 5 minutes, instrumental unless lyrics are asked for; sound effects of half a second to 30 seconds, looping if wanted; floating audio tracks from the library or a URL; separating a clip's vocals from its background; volume keyframes.
+- **Captions and text**: burned-in captions in one preset per video (Kamua, Word by Word, Word Highlight, Word Background Highlight, or plain on-screen text), per-word swaps and censoring, bleeped words, and transcript corrections (misheard words, name spellings, speaker names) that flow into the captions.
+- **Analysis and writing**: library-wide scans, themes, statistics, comparison tables, lists of people, products or claims, reports delivered as files, and web research after the library has been searched.
+
+A video with no library footage in it is possible: generated clips, graphics, voiceover and music combine on one timeline. The agent writes scripts from what is in the library, so a from-nothing piece needs the script, or the facts, in the brief.
+
+What it cannot do: rotation, custom transitions, speed ramps, reverse playback, pitch shift or time stretch, noise reduction, EQ, colour grading, LUTs, stabilisation, face blurring, motion tracking or masks. It renders at source resolution, watermarked unless a clean render is asked for (billed). It edits one project at a time. Recordings the user wants analysed or cut go into the library first (`/starzero:ingest-media`); a link in the chat is stored as an asset at most, not analysed.
 
 ## One chat per task
 
 - A chat is scoped to a library and sees all of it. "Scan the whole library", "find every mention of X across all interviews", "make a recap of everything from last week" is one chat with one message; the agent iterates over the media. Creating one chat per media item multiplies the billed turns, loses the cross-media view the agent has, and is the wrong shape for every task.
 - `--content <mediaId...>` narrows the agent's attention to named items when the user asks for a task about those specific items. Leave it out for anything library-wide.
-- Describe the task and the desired output in one message, the way you would brief a capable editor: the goal, constraints (length, format, aspect, tone), and what to deliver. The agent breaks it into steps on its own; sending the steps one message at a time costs a turn each.
+- Describe the task and the desired output in one message, the way you would brief a capable editor: the goal, the source material (library items, or none), constraints (length, format, aspect, tone, voice, music), and what to deliver. Name generated elements as such ("a 20-second animated title sequence with a voiceover reading this script, then the three best clips about X"). The agent breaks it into steps on its own; sending the steps one message at a time costs a turn each.
 - Continue an existing chat for follow-ups on the same task ("shorter", "add the intro", "now do the same for the Q3 batch"); its context is already there. Start a new chat when the task is unrelated.
 
 ## Prerequisites
@@ -36,7 +52,7 @@ Hands a task to the StarZero agent and relays the result. The agent is an agenti
 `chat send` bills one agent turn, and the cost is known only afterwards (the footer of the summary line shows it). Before every send, including one that answers the agent's questions or retries with `--artifact`:
 
 1. Before the first send in a session, run `starzero credits` (free) for `creditsLeft`; a turn's own cost is known only afterwards, from the summary footer.
-2. Ask once, in words, and wait for the answer: one question that carries the task, the billing and the balance ("Send the recap task to the StarZero agent; the turn is billed by what it does, 12,400 credits left. Go ahead?"). On the first send in a chat, add that the agent acts on the library without further approval: it renders and edits on its own once the task is sent. The user can waive this question for the session (`credits.md`, "Waiving the question"); the statement in step 1 still comes first, and the agent's own `questions` are always relayed. The Bash call's `description` repeats the billing line, for example `Send the recap task to the StarZero agent (billed turn; 12,400 credits left)`.
+2. Ask once, in words, and wait for the answer: one question that carries the task, the billing and the balance ("Send the recap task to the StarZero agent; the turn is billed by what it does, 12,400 credits left. Go ahead?"). On the first send in a chat, add that the agent acts without further approval once the task is sent: it edits, renders, generates footage and audio, and scans the library on its own, each step billed. The user can waive this question for the session (`credits.md`, "Waiving the question"); the statement in step 1 still comes first, and the agent's own `questions` are always relayed. The Bash call's `description` repeats the billing line, for example `Send the recap task to the StarZero agent (billed turn; 12,400 credits left)`.
 3. Run it once, after the yes. A send that timed out, was interrupted or lost its stream has started; `chat get` shows the result. A second send is a second bill and is asked about again.
 
 ## What to report
