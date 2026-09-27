@@ -9,8 +9,7 @@
   says so on both routes.
 - Long commands (`chat send`, the watches, `output render`, `auth login`) run in the background
   instead of under a `--timeout` sized to the Bash tool's limit: Claude Code moves a command that
-  outlives its timeout to the background rather than stopping it. `--timeout` stays for headless
-  runs, where background commands end with the turn.
+  outlives its timeout to the background rather than stopping it, so `--timeout` stays off.
 
 ## 0.4.1
 

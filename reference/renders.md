@@ -24,7 +24,7 @@ Neither URL contains the API key, so both are safe to paste.
 
 - Watermarked by default, and free. `--no-watermark` gives a clean render, bills credits (per rendered minute); it counts as a billed command under `credits.md`.
 - `--height` (default 1080) and `--aspect` (`9:16`, `2:3`, `4:5`, `1:1`, `5:4`, `16:9`; default keeps the source ratio) size the output.
-- The command blocks until the render is done, with no limit unless `--timeout <seconds>` caps it (exit 6, which cancels the render). A short compilation takes seconds; a long one runs in the background as `waiting.md` describes, so `--timeout` stays off unless the run is headless.
+- The command blocks until the render is done, with no limit unless `--timeout <seconds>` caps it (exit 6, which cancels the render). A short compilation takes seconds; a long one runs in the background as `waiting.md` describes, so `--timeout` stays off.
 - The URL is the whole result: a temporary render has no record, so `output url` and `output share` cannot serve it, and there are no `next` hints. The URL is valid for about a day and the file for longer; download it with `curl -o` while it is. JSON: `{ "renderId", "width", "height", "durationSeconds", "url", "urlExpiresInSeconds" }`.
 
 ## Rules
