@@ -13,7 +13,7 @@ The CLI documents itself. Discover commands with `--help` instead of guessing fl
 
 - The human output is the default and the cheaper one to read: tables with the id in the first column, `warning:` lines, and `hint (label): starzero ...` lines carrying the exact follow-up command. Read it as text. `--json` prints the full `data` object instead and exists for piping into other commands; reach for it only when a value is extracted mechanically (`jq` over ids, `processing` on `chat get`, a template's inputs from `describe`), since it is never smaller than the table and often much larger.
 - `--print-traffic` logs request and response bodies to stderr, settings included. Reserve it for debugging a request with the user's agreement, and keep it out of shared transcripts.
-- `STARZERO_API_KEY`, `STARZERO_KEYRING`, `STARZERO_CONFIG_DIR`: see `auth.md`.
+- `STARZERO_API_KEY`, `STARZERO_CONFIG_DIR`: see `auth.md`.
 
 ## Output contract
 

@@ -14,10 +14,9 @@ The browser login is the route everywhere: Claude Code and Cowork alike, with no
 In order:
 
 1. `STARZERO_API_KEY` in the environment.
-2. The credentials file `$STARZERO_CONFIG_DIR/credentials` (default `~/.starzero/credentials`) when `STARZERO_KEYRING=0` is set.
-3. The OS keychain otherwise (Credential Manager on Windows, Keychain on macOS, Secret Service on Linux).
+2. The credentials file `$STARZERO_CONFIG_DIR/credentials` (default `~/.starzero/credentials`), on every platform.
 
-`starzero auth login` stores to the keychain, or to the credentials file with `STARZERO_KEYRING=0`. The plugin's launcher sets `STARZERO_KEYRING=0` on its own when that file exists and the variable is unset, so a login made in file mode is found by every later command. `starzero auth logout` removes the stored credential and revokes a browser token on the server. `starzero auth status` shows whose credential is stored, its type, scopes and expiry; run it once at the start of a job and after any exit 3.
+`starzero auth login` writes that file (one line, owner-only, mode 0600). On macOS and Linux the CLI refuses to read a file that other users can read (`CREDENTIALS_INSECURE`). CLI versions before 0.8.0 kept the credential in the OS keychain instead; that item is no longer read, so a user who logged in with an earlier version is "Not logged in" once and logs in again. `starzero auth logout` removes the stored credential and revokes a browser token on the server. `starzero auth status` shows whose credential is stored, its type, scopes and expiry; run it once at the start of a job and after any exit 3.
 
 ## Logging in from a skill
 
@@ -29,7 +28,7 @@ In order:
 
 **Without a browser on this machine** (containers, remote hosts, a desktop where no tab opened):
 
-1. Run `starzero auth login --no-browser`. It prints the login URL and exits; the half-finished login waits in `~/.starzero/login-pending.json` (owner-only) for up to an hour. Add `STARZERO_KEYRING=0` when the machine has no keychain (`KEYCHAIN_UNAVAILABLE` on an earlier attempt).
+1. Run `starzero auth login --no-browser`. It prints the login URL and exits; the half-finished login waits in `~/.starzero/login-pending.json` (owner-only) for up to an hour.
 2. Give the user the URL to open on any device (a phone will do). The login ends on a page that cannot load, at `http://127.0.0.1:<port>/callback?...`; ask the user to paste that page's full address into the chat.
 3. Run `starzero auth login --callback "<the pasted address>"`. Exit 0 means the token is stored; `starzero auth status` confirms it.
 
@@ -41,10 +40,9 @@ The pasted address holds a one-time code that only this pending login can redeem
 
 | Symptom | Meaning | Recovery |
 | --- | --- | --- |
-| `AUTH` "Not logged in" | nothing stored, or a token older than 5 days | log in again, as above |
+| `AUTH` "Not logged in" | nothing stored, a token older than 5 days, or a login made with a CLI before 0.8.0 (kept in the OS keychain, no longer read) | log in again, as above |
 | `AUTH` on `auth login --api-key` | the key was mistyped or revoked; nothing was stored | new key from https://app.starzero.ai/settings/api-keys |
-| `KEYCHAIN_UNAVAILABLE` | no OS keychain reachable (headless Linux, containers, sandboxes) | log in again with `STARZERO_KEYRING=0` set; the launcher then selects the file for every later command |
-| `CREDENTIALS_INSECURE` | the credentials file is readable by other users | `chmod 600 ~/.starzero/credentials` |
+| `CREDENTIALS_INSECURE` | the credentials file is readable by other users (checked on macOS and Linux) | `chmod 600 ~/.starzero/credentials` |
 | `AUTH` on one command while `auth status` works | the credential lacks a scope for that command | a browser login covers every skill; an API key needs a new key with the scope, since scopes cannot be added to an existing one |
 
 ## Scopes per job (API keys)
@@ -67,4 +65,4 @@ A key for every skill: `profile:read`, `billing:read`, `library:read`, `library:
 
 ## Credential hygiene
 
-The credential stays in the CLI's store or the environment. Skills reach it only through `starzero` commands, keeping it out of output, logs and URLs; `media url` and `output url` exist so links carry no credential. An API key the user typed into the chat stays in that conversation's history; say so once, and point at the API keys page for making a new key and revoking the old one.
+The credential stays in the credentials file or the environment. An API key in that file is a long-lived secret and a browser token lasts 5 days; on a shared machine, `STARZERO_API_KEY` set for the session keeps the key out of the file. Skills reach it only through `starzero` commands, keeping it out of output, logs and URLs; `media url` and `output url` exist so links carry no credential. An API key the user typed into the chat stays in that conversation's history; say so once, and point at the API keys page for making a new key and revoking the old one.

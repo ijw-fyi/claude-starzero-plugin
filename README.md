@@ -22,7 +22,7 @@ Then, in a Claude Code session:
 
 Setup downloads the CLI on first use, installs `ffprobe` next to it on Linux and Windows, then logs
 you in: a browser tab opens on the StarZero login page, and the CLI stores the resulting token in
-your OS credential store. Nothing is pasted into the chat. A browser login lasts 5 days; any skill
+`~/.starzero/credentials`, readable by you alone. Nothing is pasted into the chat. A browser login lasts 5 days; any skill
 logs you in again when it has expired. On a machine without a browser, setup gives you a URL to
 open on any device and asks for the address the login ends on. An API key from
 https://app.starzero.ai/settings/api-keys works too (`starzero auth login --api-key`), for example
@@ -73,9 +73,12 @@ starting a second run while one is active.
   the platform and which kind of credential was in use; never your arguments, files, keys or
   tokens. It prints the report's event id. `DO_NOT_TRACK=1` or an empty `STARZERO_SENTRY_DSN=`
   in your environment turns it off.
-- Your credential lives in the OS credential store (Credential Manager, Keychain, Secret Service),
-  or in `~/.starzero/credentials` (mode 0600) on a machine without one. `starzero auth logout`
-  removes it and revokes a browser login token. The connector's sign-in token is separate and
+- Your credential lives in `~/.starzero/credentials` (or under `$STARZERO_CONFIG_DIR`), one line
+  with mode 0600, on every platform; on macOS and Linux the CLI refuses the file when other users
+  can read it. `starzero auth logout` removes it and revokes a browser login token. CLI versions
+  before 0.8.0 used the OS keychain, and the CLI leaves that item alone: to remove it, delete the
+  `starzero-cli` item in Keychain Access (macOS) or the generic credential whose name contains
+  `starzero-cli` in Credential Manager (Windows). The connector's sign-in token is separate and
   lives where your MCP client keeps such tokens: Claude Code's credential store, or claude.ai for
   chat; disconnecting the connector there ends it.
 - The plugin has no hooks and no plugin options. It bundles one remote MCP server, the StarZero
@@ -100,8 +103,8 @@ On claude.ai chat, if both appear, connect one; both carry the same tools.
 ## Other surfaces
 
 - **Cowork**: the plugin installs and the skills work when the session runs on your computer;
-  the browser login works the same way there. The connector shows on the plugin's Connectors tab
-  and is not needed.
+  the browser login works the same way there. The connector shows on the plugin's Connectors tab;
+  connecting it works and is optional, since the skills use the CLI.
 - **Claude Code cloud sessions** (claude.ai/code): plugins are not loaded there. Install the CLI
   in the environment's setup script and set `STARZERO_API_KEY` as an environment variable or API
   credential; the CLI reads it first.
@@ -114,7 +117,7 @@ On claude.ai chat, if both appear, connect one; both carry the same tools.
 claude --plugin-dir .          # load the working tree for one session
 # Opening this repo in Claude Code also offers `.mcp.json` as a project MCP server; approve or skip it.
 claude plugin validate . --strict
-test/launcher.sh               # downloads the pinned CLI into a temp HOME; keyring selection
+test/launcher.sh               # downloads the pinned CLI into a temp HOME and runs it
 scripts/check-versions.sh
 ```
 
