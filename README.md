@@ -1,8 +1,8 @@
 # StarZero plugin for Claude Code
 
-Upload media to StarZero, search transcripts and what is on screen, run workflow templates, cut
-podcast clips, chat with the StarZero agent and share renders, from Claude Code, Cowork and
-claude.ai chat. Where there is a shell, the plugin drives the
+Upload media to StarZero or import it from video URLs, search transcripts and what is on screen,
+run workflow templates, cut podcast clips, chat with the StarZero agent and share renders, from
+Claude Code, Cowork and claude.ai chat. Where there is a shell, the plugin drives the
 [`starzero` command-line tool](https://github.com/ijw-fyi/starzero-cli-releases) and installs it
 for you; on claude.ai chat it offers the StarZero connector, a remote MCP server with the same
 API as tools.
@@ -35,7 +35,7 @@ estimate before uploads.
 
 | Skill | Ask for things like |
 | --- | --- |
-| `starzero:ingest-media` | "upload these recordings to my Interviews library and tell me when they are searchable" |
+| `starzero:ingest-media` | "upload these recordings to my Interviews library and tell me when they are searchable", "add this YouTube playlist to the library" |
 | `starzero:find-moments` | "find where they talk about pricing", "which clip shows the whiteboard", "compile those moments into one preview" |
 | `starzero:run-workflow` | "run the highlights template on last week's uploads" |
 | `starzero:podcast-clips` | "cut this episode into five vertical clips with captions" |
@@ -47,11 +47,13 @@ Skills trigger on their own from what you say; `/starzero:<skill>` runs one dire
 
 ## Credits and confirmation
 
-Uploads, workflow runs, podcast clip runs, chat turns and clean (`--no-watermark`) renders spend
-StarZero credits. Before each one, Claude states what the command bills and your balance (uploads
-show the dry-run estimate, for example "about 48 credits, of 12,400 left") and asks whether to go
-ahead. To skip the question, say so ("go ahead without asking") and it stays skipped for the rest
-of the session; a line in your `CLAUDE.md` makes that permanent. Claude still tells you the cost
+Uploads, imports from video URLs, workflow runs, podcast clip runs, chat turns and clean
+(`--no-watermark`) renders spend StarZero credits. Before each one, Claude states what the command
+bills and your balance (uploads show the dry-run estimate, for example "about 48 credits, of
+12,400 left"; imports have no estimate, and the server refuses a batch it cannot cover before
+billing anything) and asks whether to go ahead. To skip the question, say so ("go ahead without
+asking") and it stays skipped for the rest of the session; a line in your `CLAUDE.md` makes that
+permanent. Claude still tells you the cost
 before each billed command, and still asks about decisions that change what runs, such as
 starting a second run while one is active.
 
@@ -67,7 +69,10 @@ starting a second run while one is active.
   checksums, stored next to the CLI.
 - Hosts contacted: `github.com` and its release downloads for the two binaries; StarZero's own API
   (`api.starzero.ai`) and app (`app.starzero.ai`) for everything the skills do; `mcp.starzero.ai`
-  only where the connector is used. Your credential is sent only to StarZero.
+  only where the connector is used. Your credential is sent only to StarZero. When you hand the
+  plugin a playlist, channel or folder URL and `yt-dlp` is installed on your machine, Claude runs
+  it to list the video URLs, so that page is fetched from your machine; the videos themselves are
+  fetched by StarZero's servers. The plugin installs nothing for this.
 - On a crash of the CLI itself (an `INTERNAL` error, a bug), the CLI sends one report to StarZero's
   Sentry project (`ingest.us.sentry.io`): the error message, the command name, the CLI version,
   the platform and which kind of credential was in use; never your arguments, files, keys or

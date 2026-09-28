@@ -6,7 +6,7 @@
 | --- | --- | --- | --- |
 | library | 24-hex | `library list`, `library create` | `--library` on `folder`, `media`, `search`, `workflow instance create`, `podcast-clips create`, `chat create` |
 | folder | a path such as `/raw/interviews`, not an id | `folder list`, `folder create` | `--folder`, `--to`, `--path` |
-| media | 24-hex | `media list`, `media get`, `media upload` rows, search hits (`mediaId`), `next.watch` | `media get/move/url/download/thumbnail/watch`, `--media` on `search`, `workflow instance create`, `podcast-clips create`; `chat create --content` |
+| media | 24-hex | `media list`, `media get`, `media upload` and `media import` rows, search hits (`mediaId`), `next.watch` | `media get/move/url/download/thumbnail/watch`, `--media` on `search`, `workflow instance create`, `podcast-clips create`; `chat create --content` |
 | template | 24-hex | `workflow template list`, `workflow template describe` | `workflow instance create --template`, `workflow instance list --template` |
 | instance | 24-hex | `workflow instance create/list`, `podcast-clips create/list` (a podcast run is an instance) | `workflow instance get/watch/cancel` |
 | session (a workflow branch) | chat-shaped string | instance views (`sessions`, `outputs[].sessionId`) | only the chat link the CLI prints; `chat send` to a branch session is not supported |
@@ -34,4 +34,4 @@ Pass links through as printed; composing one by hand is unsupported.
 
 ## Folders
 
-Folders are paths inside a library. `folder create --path /raw/interviews` before `media upload --folder /raw/interviews`; upload refuses a folder that does not exist.
+Folders are paths inside a library. `folder create --path /raw/interviews` before `media upload --folder /raw/interviews` or `media import --folder /raw/interviews`; both refuse a folder that does not exist.
