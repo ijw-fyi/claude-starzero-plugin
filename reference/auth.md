@@ -56,6 +56,7 @@ A browser login carries all of these. An API key carries what was chosen when it
 | list and inspect libraries, folders, media; thumbnails, URLs, downloads | `library:read` |
 | create libraries and folders, move media | `library:write` |
 | `media upload` | `library:read`, `library:write`; `billing:read` for the credit estimate |
+| `media import` | `library:read`, `library:write` |
 | `search transcript`, `search visual` | `library:search` |
 | `workflow instance create`, `podcast-clips create` | `profile:read`, `billing:read`, `library:read`, `library:search`, `rendering:read`, `rendering:write` |
 | `output url`, `output share` | `rendering:read` |

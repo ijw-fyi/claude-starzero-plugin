@@ -5,6 +5,7 @@ StarZero bills in credits. These commands spend them:
 | Command | What is billed | Estimate available |
 | --- | --- | --- |
 | `media upload` | processing of the new media | yes: `media upload --dry-run` (needs ffprobe and `billing:read`) |
+| `media import` | processing of the new media, per video URL | no; the server refuses the whole batch with exit 5 when the balance is short, billing nothing |
 | `workflow instance create` | the whole run, per fan-out item | no |
 | `podcast-clips create` | the whole run | no |
 | `chat send` | the agent turn | no; the footer shows what it cost afterwards |
@@ -16,7 +17,7 @@ Billing starts at the request. `workflow instance cancel` stops a run and refund
 
 Before any of the billed commands:
 
-1. Run `starzero credits` and say what will run, as the exact command, what it bills, and the balance it draws on (`creditsLeft`, plus the soonest note expiry when one is close): the estimate from `--dry-run` for uploads, "one run of template X on N media items" for workflows, "one clip run" for podcasts, "one agent turn" for chats, "a clean render of N seconds" for `--no-watermark`.
+1. Run `starzero credits` and say what will run, as the exact command, what it bills, and the balance it draws on (`creditsLeft`, plus the soonest note expiry when one is close): the estimate from `--dry-run` for uploads, "N videos, unestimated" for imports, "one run of template X on N media items" for workflows, "one clip run" for podcasts, "one agent turn" for chats, "a clean render of N seconds" for `--no-watermark`.
 2. Ask once, in words, and wait for the answer. One short question that carries the same line ("Upload 3 files to Interviews for about 48 credits, of 12,400 left. Go ahead?"), with any decision folded into it: a run is already active, validation was skipped, or a flag such as `--force` or `--skip-credit-check` is being considered. The Bash call's `description` repeats the billing line (`Upload 3 files to Interviews (bills ~48 credits, 12,400 left)`), so a permission box, where one appears, shows it too.
 3. Run it once, after the yes. `workflow instance create` and `podcast-clips create` say so when they return: the run started and is being billed. A create that errored after returning an id, timed out, or was interrupted has started; `waiting.md` covers resuming it. A second create is a second bill and is asked about again.
 
