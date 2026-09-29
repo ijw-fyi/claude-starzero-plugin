@@ -2,10 +2,11 @@
 
 ## 0.6.2
 
-- A SessionStart hook: when no credential is stored (`~/.starzero/credentials` or
-  `STARZERO_API_KEY`), Claude is told at the start of the session to run `/starzero:setup` before
-  the first StarZero request. It reads that one fact and nothing else, and is silent once logged
-  in. `test/session-start.sh` covers it.
+- A SessionStart hook: the plugin's `scripts` folder goes on the PATH of the session's Bash
+  commands, so `starzero` typed bare runs the launcher; and when no credential is stored
+  (`~/.starzero/credentials` or `STARZERO_API_KEY`), Claude is told at the start of the session to
+  run `/starzero:setup` before the first StarZero request. It reads that one fact and nothing
+  else, and is silent once logged in. `test/session-start.sh` covers it.
 - README: a "Before you start" section, since the directory shows the README as the listing text
   and nothing said an account and a plan with credits come first.
 

@@ -97,10 +97,12 @@ starting a second run while one is active.
   `starzero-cli` in Credential Manager (Windows). The connector's sign-in token is separate and
   lives where your MCP client keeps such tokens: Claude Code's credential store, or claude.ai for
   chat; disconnecting the connector there ends it.
-- One hook, at session start: `scripts/session-start` checks whether `~/.starzero/credentials`
-  (or `$STARZERO_CONFIG_DIR/credentials`) exists or `STARZERO_API_KEY` is set, and when neither
-  is, tells Claude to run `/starzero:setup` before the first StarZero request. It reads nothing
-  else, contacts nothing, and prints nothing once you are logged in. No plugin options. It bundles
+- One hook, at session start: `scripts/session-start` puts the plugin's `scripts` folder on the
+  PATH of the session's Bash commands, so a bare `starzero` resolves to the launcher (nothing is
+  installed until the first command runs), and checks whether `~/.starzero/credentials` (or
+  `$STARZERO_CONFIG_DIR/credentials`) exists or `STARZERO_API_KEY` is set; when neither is, it
+  tells Claude to run `/starzero:setup` before the first StarZero request. It reads nothing else,
+  contacts nothing, and prints nothing once you are logged in. No plugin options. It bundles
   one remote MCP server, the StarZero connector at `https://mcp.starzero.ai/mcp`, described below;
   no local MCP server.
 

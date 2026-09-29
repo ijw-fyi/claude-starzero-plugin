@@ -1,5 +1,6 @@
 #!/bin/sh
-# The SessionStart hook speaks only when no credential is in place.
+# The SessionStart hook speaks only when no credential is in place, and writes the PATH line
+# to the env file when Claude Code provides one.
 set -eu
 
 root=$(cd "$(dirname "$0")/.." && pwd)
@@ -24,4 +25,9 @@ mkdir -p "$home/cfg" && printf '{}\n' > "$home/cfg/credentials"
 out=$(HOME="$home/none" STARZERO_API_KEY='' STARZERO_CONFIG_DIR="$home/cfg" "$hook")
 [ -z "$out" ] || { printf 'FAIL STARZERO_CONFIG_DIR credentials: expected silence, got: %s\n' "$out"; exit 1; }
 
-printf 'ok   session-start speaks only without a credential\n'
+env_file="$home/env"
+out=$(HOME="$home/none" STARZERO_API_KEY=key CLAUDE_ENV_FILE="$env_file" "$hook")
+[ -z "$out" ] || { printf 'FAIL with CLAUDE_ENV_FILE: expected silence, got: %s\n' "$out"; exit 1; }
+grep -q "^export PATH=\"$root/scripts:\$PATH\"$" "$env_file" || { printf 'FAIL env file lacks the PATH line:\n'; cat "$env_file"; exit 1; }
+
+printf 'ok   session-start speaks only without a credential, and puts scripts/ on PATH\n'
