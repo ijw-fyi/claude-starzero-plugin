@@ -39,8 +39,8 @@ open on any device and asks for the address the login ends on. An API key from
 https://app.starzero.ai/settings/api-keys works too (`starzero auth login --api-key`), for example
 in a cloud session where `STARZERO_API_KEY` is set as an environment variable.
 
-On macOS, install ffprobe with `brew install ffmpeg`; it is optional and only powers the credit
-estimate before uploads.
+On macOS, install ffprobe with `brew install ffmpeg`; it is optional: it powers the credit
+estimate before uploads and checks a graphic rendered as MP4 before it is handed over.
 
 ## What you can ask for
 
@@ -50,7 +50,7 @@ estimate before uploads.
 | `starzero:find-moments` | "find where they talk about pricing", "which clip shows the whiteboard", "compile those moments into one preview" |
 | `starzero:run-workflow` | "run the highlights template on last week's uploads" |
 | `starzero:podcast-clips` | "cut this episode into five vertical clips with captions" |
-| `starzero:chat` | "ask the StarZero agent to make a two-minute recap of this library", "find every product mention across all interviews", "make an animated intro with a voiceover and music for this episode" (the agent works across the whole library in one chat, and generates video, graphics, voiceover, music and images) |
+| `starzero:chat` | "trim this interview to 60 seconds, 9:16, with captions", "add a lower-third with her name", "ask the StarZero agent to make a two-minute recap of this library", "find every product mention across all interviews", "make an animated intro with a voiceover and music for this episode" (every edit of a video goes through the agent, which works across the whole library in one chat and generates video, voiceover, music and images; Claude makes the designed graphics itself and hands them over for placement) |
 | `starzero:share-render` | "give me a link to the video", "download the output" |
 | `starzero:setup` | install, log in, check scopes (you run this one yourself) |
 

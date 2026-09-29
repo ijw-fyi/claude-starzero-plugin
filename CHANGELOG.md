@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.6.3
+
+- Every edit of a video goes through the chat skill: its description now carries the phrases an
+  edit request uses ("trim this to 60 seconds", "make it 9:16", "add captions", "add a
+  lower-third") and the skill says why a local tool on a downloaded file is the wrong route (word
+  timings, speaker-following reframe, caption presets, the agent's checks). find-moments says its
+  render is a preview and its download is for the user's own use.
+- Designed graphics are made in the session and placed by the agent: `reference/graphics.md`
+  covers the two file forms (SVG with a viewBox and fonts by URL, or an H.264 MP4), one element per
+  file under 25 MiB, one `chat send --file` turn with a placement brief that asks the agent to
+  place the files as they are. Captions and plain on-screen text stay with the agent.
+
 ## 0.6.2
 
 - A SessionStart hook: the plugin's `scripts` folder goes on the PATH of the session's Bash
