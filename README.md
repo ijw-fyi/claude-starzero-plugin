@@ -7,6 +7,14 @@ Claude Code, Cowork and claude.ai chat. Where there is a shell, the plugin drive
 for you; on claude.ai chat it offers the StarZero connector, a remote MCP server with the same
 API as tools.
 
+## Before you start
+
+You need a StarZero account: sign up at https://app.starzero.ai. Everything that bills (uploads,
+imports, workflow and podcast runs, chat turns, clean renders) draws on the credits of your plan,
+so pick one in the app before the first of those; listing and inspecting what you already have
+needs no credits. Claude Code is the surface this README describes; Cowork and claude.ai chat are
+covered under "Other surfaces" below.
+
 ## Install
 
 ```sh

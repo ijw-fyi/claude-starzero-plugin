@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.6.2
+
+- README: a "Before you start" section, since the directory shows the README as the listing text
+  and nothing said an account and a plan with credits come first.
+
 ## 0.6.1
 
 - CLI pinned at 0.9.0: `starzero media import` creates media from video URLs (YouTube, Google
