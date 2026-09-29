@@ -7,6 +7,14 @@ Claude Code, Cowork and claude.ai chat. Where there is a shell, the plugin drive
 for you; on claude.ai chat it offers the StarZero connector, a remote MCP server with the same
 API as tools.
 
+## Before you start
+
+You need a StarZero account: sign up at https://app.starzero.ai. Everything that bills (uploads,
+imports, workflow and podcast runs, chat turns, clean renders) draws on the credits of your plan,
+so pick one in the app before the first of those; listing and inspecting what you already have
+needs no credits. Claude Code is the surface this README describes; Cowork and claude.ai chat are
+covered under "Other surfaces" below.
+
 ## Install
 
 ```sh
@@ -19,6 +27,9 @@ Then, in a Claude Code session:
 ```
 /starzero:setup
 ```
+
+Until you are logged in, Claude is told at the start of each session to run setup first, so asking
+for a StarZero job straight away works too.
 
 Setup downloads the CLI on first use, installs `ffprobe` next to it on Linux and Windows, then logs
 you in: a browser tab opens on the StarZero login page, and the CLI stores the resulting token in
@@ -86,8 +97,14 @@ starting a second run while one is active.
   `starzero-cli` in Credential Manager (Windows). The connector's sign-in token is separate and
   lives where your MCP client keeps such tokens: Claude Code's credential store, or claude.ai for
   chat; disconnecting the connector there ends it.
-- The plugin has no hooks and no plugin options. It bundles one remote MCP server, the StarZero
-  connector at `https://mcp.starzero.ai/mcp`, described below; no local MCP server.
+- One hook, at session start: `scripts/session-start` puts the plugin's `scripts` folder on the
+  PATH of the session's Bash commands, so a bare `starzero` resolves to the launcher (nothing is
+  installed until the first command runs), and checks whether `~/.starzero/credentials` (or
+  `$STARZERO_CONFIG_DIR/credentials`) exists or `STARZERO_API_KEY` is set; when neither is, it
+  tells Claude to run `/starzero:setup` before the first StarZero request. It reads nothing else,
+  contacts nothing, and prints nothing once you are logged in. No plugin options. It bundles
+  one remote MCP server, the StarZero connector at `https://mcp.starzero.ai/mcp`, described below;
+  no local MCP server.
 
 ## The StarZero connector
 
@@ -123,6 +140,7 @@ claude --plugin-dir .          # load the working tree for one session
 # Opening this repo in Claude Code also offers `.mcp.json` as a project MCP server; approve or skip it.
 claude plugin validate . --strict
 test/launcher.sh               # downloads the pinned CLI into a temp HOME and runs it
+test/session-start.sh          # the SessionStart hook speaks only without a credential
 scripts/check-versions.sh
 ```
 

@@ -1,0 +1,17 @@
+#!/bin/sh
+# SessionStart hook. Two things, both read-only on the machine:
+# - puts this folder on PATH for the session's Bash commands (through the env file Claude Code hands
+#   the hook), so a bare `starzero` resolves to the launcher next to this script;
+# - prints one line for Claude when no StarZero credential is in place, so the first StarZero request
+#   starts with the setup skill instead of a failing command. Reads whether the credentials file
+#   exists and whether STARZERO_API_KEY is set; nothing else, no network.
+set -eu
+
+here=$(cd "$(dirname "$0")" && pwd)
+# shellcheck disable=SC2016 # the $PATH is expanded later, when Claude Code sources the env file
+[ -n "${CLAUDE_ENV_FILE:-}" ] && printf 'export PATH="%s:$PATH"\n' "$here" >> "$CLAUDE_ENV_FILE"
+
+[ -n "${STARZERO_API_KEY:-}" ] && exit 0
+[ -s "${STARZERO_CONFIG_DIR:-$HOME/.starzero}/credentials" ] && exit 0
+
+echo "StarZero plugin: no login is stored on this machine yet. Before the first StarZero request, run the setup skill (/starzero:setup): it installs the starzero CLI and logs the user in through the browser, or with an API key where there is no browser."
