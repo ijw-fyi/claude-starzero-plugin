@@ -1,0 +1,10 @@
+#!/bin/sh
+# SessionStart hook. Prints one line for Claude when no StarZero credential is in place, so the
+# first StarZero request starts with the setup skill instead of a failing command. Reads whether
+# the credentials file exists and whether STARZERO_API_KEY is set; nothing else, no network.
+set -eu
+
+[ -n "${STARZERO_API_KEY:-}" ] && exit 0
+[ -s "${STARZERO_CONFIG_DIR:-$HOME/.starzero}/credentials" ] && exit 0
+
+echo "StarZero plugin: no login is stored on this machine yet. Before the first StarZero request, run the setup skill (/starzero:setup): it installs the starzero CLI and logs the user in through the browser, or with an API key where there is no browser."
