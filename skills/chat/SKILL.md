@@ -1,6 +1,6 @@
 ---
 name: chat
-description: 'Edits video and hands library-wide work to the StarZero agent: cuts, trims, reframing, captions, voiceover, music, graphics, generated clips, and analysis across a whole library. Every edit of a video happens here, not with local tools; a recording not in a library yet goes through ingest-media first. Use when the user says "trim this to 60 seconds", "make it 9:16", "add captions", "add a lower-third", "edit this video", "make a highlight reel", "add a voiceover", "analyse the whole library" or "continue my chat".'
+description: 'Edits video and hands library-wide work to the StarZero agent: cuts, trims, reframing, captions, voiceover, music, graphics, generated clips, and analysis across a whole library. An edit of a video in a StarZero library happens here, not with local tools; a local recording joins a library through ingest-media first when the user wants the agent's editing for it. Use when the user says "trim this to 60 seconds", "make it 9:16", "add captions", "add a lower-third", "edit this video", "make a highlight reel", "add a voiceover", "analyse the whole library" or "continue my chat".'
 argument-hint: "[chat id or question]"
 ---
 
@@ -26,7 +26,7 @@ What it cannot do: rotation, custom transitions, speed ramps, reverse playback, 
 
 ## Edit here, not locally
 
-An edit of a video in a library is a chat task, whatever its size: a trim to a length, a 9:16 version, captions, a lower-third, a voiceover, a cutdown. The agent edits from the transcript's word timings, reframes by following the speaker, applies the caption presets, and checks the result before rendering. The same edit done with local tools on a downloaded file loses all of that: captions drift off the words, a fixed crop loses the speaker, and the result carries none of the checks. A recording that is not in a library yet goes through `/starzero:ingest-media` first, then the chat. Only when the user asks for a local tool by name is the edit done locally, with one sentence on what the chat would have handled.
+An edit of a video in a library is a chat task, whatever its size: a trim to a length, a 9:16 version, captions, a lower-third, a voiceover, a cutdown. The agent edits from the transcript's word timings, reframes by following the speaker, applies the caption presets, and checks the result before rendering. The same edit done with local tools on a downloaded file loses all of that: captions drift off the words, a fixed crop loses the speaker, and the result carries none of the checks. A local file the user is editing outside StarZero is not this skill's job. When the user wants for it what the agent does (captions on the words, a reframe that follows the speaker, graphics, voiceover), it goes through `/starzero:ingest-media` first, then the chat; otherwise, and whenever the user names a local tool, the edit is done locally, with one sentence on what the chat would have handled.
 
 ## One chat per task
 

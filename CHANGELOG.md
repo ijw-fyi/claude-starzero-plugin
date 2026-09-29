@@ -2,7 +2,7 @@
 
 ## 0.6.3
 
-- Every edit of a video goes through the chat skill: its description now carries the phrases an
+- An edit of a video in a library goes through the chat skill: its description now carries the phrases an
   edit request uses ("trim this to 60 seconds", "make it 9:16", "add captions", "add a
   lower-third") and the skill says why a local tool on a downloaded file is the wrong route (word
   timings, speaker-following reframe, caption presets, the agent's checks). find-moments says its

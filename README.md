@@ -50,7 +50,7 @@ estimate before uploads and checks a graphic rendered as MP4 before it is handed
 | `starzero:find-moments` | "find where they talk about pricing", "which clip shows the whiteboard", "compile those moments into one preview" |
 | `starzero:run-workflow` | "run the highlights template on last week's uploads" |
 | `starzero:podcast-clips` | "cut this episode into five vertical clips with captions" |
-| `starzero:chat` | "trim this interview to 60 seconds, 9:16, with captions", "add a lower-third with her name", "ask the StarZero agent to make a two-minute recap of this library", "find every product mention across all interviews", "make an animated intro with a voiceover and music for this episode" (every edit of a video goes through the agent, which works across the whole library in one chat and generates video, voiceover, music and images; Claude makes the designed graphics itself and hands them over for placement) |
+| `starzero:chat` | "trim this interview to 60 seconds, 9:16, with captions", "add a lower-third with her name", "ask the StarZero agent to make a two-minute recap of this library", "find every product mention across all interviews", "make an animated intro with a voiceover and music for this episode" (an edit of library video goes through the agent, which works across the whole library in one chat and generates video, voiceover, music and images; Claude makes the designed graphics itself and hands them over for placement) |
 | `starzero:share-render` | "give me a link to the video", "download the output" |
 | `starzero:setup` | install, log in, check scopes (you run this one yourself) |
 
