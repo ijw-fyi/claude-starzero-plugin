@@ -1,6 +1,6 @@
 ---
 name: chat
-description: 'Edits video and hands library-wide work to the StarZero agent: cuts, trims, reframing, captions, voiceover, music, graphics, generated clips, and analysis across a whole library. An edit of a video in a StarZero library happens here, not with local tools; a local recording joins a library through ingest-media first when the user wants the agent's editing for it. Use when the user says "trim this to 60 seconds", "make it 9:16", "add captions", "add a lower-third", "edit this video", "make a highlight reel", "add a voiceover", "analyse the whole library" or "continue my chat".'
+description: 'Edits video and hands library-wide work to the StarZero agent: cuts, trims, reframing, captions, voiceover, music, graphics, generated clips, and analysis across a whole library. An edit of a video in a StarZero library happens here, not with local tools; a local recording joins a library through ingest-media first when the user wants it edited by the agent. Use when the user says "trim this to 60 seconds", "make it 9:16", "add captions", "add a lower-third", "edit this video", "make a highlight reel", "add a voiceover", "analyse the whole library" or "continue my chat".'
 argument-hint: "[chat id or question]"
 ---
 
