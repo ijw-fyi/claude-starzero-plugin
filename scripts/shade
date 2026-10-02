@@ -1,0 +1,363 @@
+#!/bin/sh
+# shade: Shade (shade.inc) drives for the storage-providers skill.
+#
+# Listing and signing go through Shade's REST API with curl and jq; bytes move through rclone's
+# native `shade` backend, configured per call through the environment (no rclone.conf is written
+# or read). The Shade API key is read from SHADE_API_KEY, else from the credentials file written
+# by `shade login`; it is handed to curl through a config on stdin and to rclone through the
+# environment, so it never appears on a command line. Run `shade --help` for the subcommands.
+set -eu
+
+api_base="${SHADE_API_URL:-https://api.shade.inc}"
+config_dir="${STARZERO_CONFIG_DIR:-$HOME/.starzero}"
+credentials_file="$config_dir/shade-credentials"
+rclone_min_major=1
+rclone_min_minor=73   # the release that added the shade backend
+install_hint="install rclone 1.73 or newer from https://rclone.org/install/ (brew install rclone on macOS; distro packages are often older), and jq from your package manager"
+
+# Exit codes follow the starzero CLI table so the skills' rules carry over.
+ex_usage=2; ex_auth=3; ex_not_found=4; ex_conflict=8
+
+usage() {
+  cat <<'USAGE'
+usage: shade <command> [args]
+
+  login (--stdin | --key-file <path>)   verify a Shade API key and store it (owner-only file)
+  logout                                remove the stored key
+  status                                check rclone, jq and the key; list the workspaces it sees
+  workspaces                            list workspaces: id, name, domain
+  drives [--workspace <id>]             list drives: id, name, workspace (all workspaces by default)
+  ls <drive> [path]                     list a drive folder (size  name per entry; folders end with /)
+  upload <drive> <file> <dest-path> [--force]    one local file to one drive path
+  download <drive> <path> <out> [--force]        one drive file to one local path
+  url <drive> <path>                    print a signed download URL for a drive file
+
+Paths are drive-relative and start with /, as in /Project/Ep 1/clip.mp4. Drive and workspace ids
+are UUIDs from `drives` and `workspaces`. Exit codes: 2 usage, 3 key missing or refused,
+4 not found, 8 destination exists (use --force), 1 anything else.
+USAGE
+}
+
+fail() {
+  # fail <exit code> <message>
+  code=$1; shift
+  printf 'shade: %s\n' "$*" >&2
+  exit "$code"
+}
+
+work_dir=$(mktemp -d)
+trap 'rm -rf "$work_dir"' EXIT INT TERM
+
+case "$(uname -s)" in
+  MINGW*|MSYS*|CYGWIN*) on_windows=1 ;;   # Git Bash, the shell Claude Code uses on Windows
+  *) on_windows=0 ;;
+esac
+
+# ---- tools -------------------------------------------------------------------------------------
+
+rclone_version_ok() {
+  # Prints the installed version; returns 1 when rclone is missing or older than the minimum.
+  command -v rclone >/dev/null 2>&1 || return 1
+  version=$(rclone version 2>/dev/null | sed -n '1s/^rclone v\([0-9][0-9.]*\).*/\1/p')
+  [ -n "$version" ] || return 1
+  major=${version%%.*}; rest=${version#*.}; minor=${rest%%.*}
+  printf '%s\n' "$version"
+  [ "$major" -gt "$rclone_min_major" ] || { [ "$major" -eq "$rclone_min_major" ] && [ "$minor" -ge "$rclone_min_minor" ]; }
+}
+
+require_tools() {
+  rclone_version_ok >/dev/null || fail 1 "rclone $rclone_min_major.$rclone_min_minor or newer is required; $install_hint"
+  command -v jq >/dev/null 2>&1 || fail 1 "jq is required; $install_hint"
+}
+
+# ---- credential ------------------------------------------------------------------------------
+
+key_source=""
+load_key() {
+  # Sets $key and $key_source; exits 3 when nothing usable is in place.
+  if [ -n "${SHADE_API_KEY:-}" ]; then
+    key=$SHADE_API_KEY; key_source="SHADE_API_KEY"; return
+  fi
+  [ -s "$credentials_file" ] || fail "$ex_auth" "no Shade key: set SHADE_API_KEY, or run \`shade login --stdin\` (see reference/providers/shade.md)"
+  if [ "$on_windows" -eq 0 ]; then
+    # Git Bash emulates mode bits, so the check is for macOS and Linux, as in the starzero CLI.
+    # shellcheck disable=SC2012 # ls -l is the one portable way to read the mode bits (stat differs on macOS)
+    mode=$(ls -ld "$credentials_file" | cut -c5-10)
+    [ "$mode" = "------" ] || fail "$ex_auth" "$credentials_file is readable by other users; run: chmod 600 $credentials_file"
+  fi
+  key=$(tr -d '[:space:]' < "$credentials_file")
+  [ -n "$key" ] || fail "$ex_auth" "$credentials_file is empty; run \`shade login --stdin\`"
+  key_source="$credentials_file"
+}
+
+store_key() {
+  # store_key <key>: owner-only directory and file, written whole then renamed.
+  umask 077
+  mkdir -p "$config_dir"
+  printf '%s\n' "$1" > "$credentials_file.partial"
+  mv -f "$credentials_file.partial" "$credentials_file"
+}
+
+# ---- REST --------------------------------------------------------------------------------------
+
+api_get() {
+  # api_get <path-and-query>: body lands in $body_file, HTTP status in $status. The key travels in
+  # a curl config read from stdin, not on the command line. Exits 3 on 401/403, 4 on 404, 1 on
+  # any other failure; returns 0 only on 2xx.
+  body_file="$work_dir/body"
+  : > "$body_file"
+  # 10 s to connect and 120 s in total: these calls return small JSON, so a longer wait is an outage
+  status=$(printf 'header = "Authorization: %s"\n' "$key" \
+    | curl -sS -K - --connect-timeout 10 --max-time 120 -o "$body_file" -w '%{http_code}' "$api_base$1") \
+    || fail 1 "could not reach $api_base (offline, or a proxy in the way?)"
+  case "$status" in
+    2??) return 0 ;;
+    401|403) fail "$ex_auth" "Shade refused the key from $key_source (HTTP $status); mint a new one under Settings > API Keys and run \`shade login --stdin\`" ;;
+    404) fail "$ex_not_found" "not found: $1 (HTTP 404) $(api_detail)" ;;
+    *) fail 1 "Shade API error on $1: HTTP $status $(api_detail)" ;;
+  esac
+}
+
+api_detail() {
+  # The API's problem+json carries a `detail`; fall back to the raw body, trimmed.
+  jq -r 'if type == "object" and .detail then .detail else empty end' "$body_file" 2>/dev/null \
+    || head -c 300 "$body_file"
+}
+
+check_uuid() {
+  # check_uuid <what> <value>
+  case "$2" in
+    [0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F]-[0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F]-[0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F]-[0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F]-[0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F]) ;;
+    *) fail "$ex_usage" "$1 must be a UUID (from \`shade drives\` or \`shade workspaces\`), got: $2" ;;
+  esac
+}
+
+drive_path() {
+  # drive_path <path>: a drive-relative path, normalised to start with one /.
+  p=$1
+  case "$p" in /*) ;; *) p="/$p" ;; esac
+  printf '%s\n' "$p"
+}
+
+urlencode() {
+  # urlencode <string>: percent-encode for a query value, with jq so no byte is mishandled.
+  printf '%s' "$1" | jq -sRr '@uri'
+}
+
+print_workspaces() {
+  api_get /workspaces
+  jq -r '.[] | [.id, (.name // ""), (.domain // "")] | @tsv' "$body_file" \
+    | awk -F'\t' 'BEGIN { printf "%-36s  %-30s  %s\n", "ID", "NAME", "DOMAIN" } { printf "%-36s  %-30s  %s\n", $1, $2, $3 }'
+}
+
+print_drives() {
+  # print_drives [workspace id]: every drive the key sees, or one workspace's.
+  if [ -n "${1:-}" ]; then
+    check_uuid "workspace id" "$1"
+    api_get /workspaces
+    workspaces=$(jq -r --arg id "$1" '.[] | select(.id == $id) | [.id, (.name // "")] | @tsv' "$body_file")
+    [ -n "$workspaces" ] || fail "$ex_not_found" "no workspace $1 for this key; see \`shade workspaces\`"
+  else
+    api_get /workspaces
+    workspaces=$(jq -r '.[] | [.id, (.name // "")] | @tsv' "$body_file")
+  fi
+  printf '%-36s  %-30s  %s\n' "ID" "NAME" "WORKSPACE"
+  printf '%s\n' "$workspaces" > "$work_dir/workspaces.tsv"
+  # read from a file, not a pipe: a `fail` inside a piped loop would end only the subshell
+  while IFS="$(printf '\t')" read -r ws_id ws_name; do
+    [ -n "$ws_id" ] || continue
+    api_get "/workspaces/$ws_id/drives"
+    jq -r --arg ws "$ws_name" '.[] | [.id, (.name // ""), $ws] | @tsv' "$body_file" \
+      | awk -F'\t' '{ printf "%-36s  %-30s  %s\n", $1, $2, $3 }'
+  done < "$work_dir/workspaces.tsv"
+}
+
+# ---- rclone --------------------------------------------------------------------------------
+
+run_rclone() {
+  # run_rclone <drive> <rclone args...>: the backend is configured through the environment for
+  # this one process, and --config names an empty file in the work dir, so a user's own (possibly
+  # encrypted) rclone.conf is neither read nor prompted for. The empty file rather than /dev/null
+  # because the null device is spelled NUL on Windows, and a path argument is converted by Git
+  # Bash where an environment value is not. stderr is kept in $rclone_err for the caller.
+  drive=$1; shift
+  rclone_err="$work_dir/rclone.err"
+  : > "$work_dir/rclone.conf"
+  # 30 s to connect, 5 min idle per request (a 64 MiB part on a slow link), rclone's default
+  # retry shape halved so a dead upstream is reported within minutes rather than an hour
+  set +e
+  RCLONE_SHADE_API_KEY="$key" RCLONE_SHADE_DRIVE_ID="$drive" \
+    rclone --config "$work_dir/rclone.conf" --ask-password=false --contimeout 30s --timeout 5m --retries 3 --low-level-retries 5 -q "$@" 2>"$rclone_err"
+  rclone_status=$?
+  set -e
+  return "$rclone_status"
+}
+
+rclone_fail() {
+  # rclone_fail <status> <what>: rclone's exit codes 3 (directory) and 4 (file) mean not found;
+  # everything else is a plain failure. Its exit 3 is never passed through, since the skills read
+  # a 3 as an expired key.
+  if grep -q 'HTTP error 40[13]\|Unauthorized\|Forbidden' "$rclone_err"; then
+    fail "$ex_auth" "Shade refused the key from $key_source while $2; mint a new one under Settings > API Keys and run \`shade login --stdin\`"
+  fi
+  case "$1" in
+    3|4) fail "$ex_not_found" "$2: not found on the drive. $(head -n 3 "$rclone_err")" ;;
+    *) fail 1 "$2 failed (rclone exit $1). $(head -n 5 "$rclone_err")" ;;
+  esac
+}
+
+remote_size() {
+  # remote_size <drive> <path>: sets $remote_result to the size of a file on the drive (or "dir")
+  # and returns 0; returns 1 when the path is absent; exits on any other failure, so a network
+  # error is never mistaken for "not there". Called directly, not in $(...): an exit inside a
+  # command substitution would end only that subshell and the caller would read "absent".
+  if run_rclone "$1" lsjson --stat --no-mimetype --no-modtime ":shade:${2#/}" >"$work_dir/stat"; then
+    remote_result=$(jq -r 'if .IsDir then "dir" else (.Size | tostring) end' "$work_dir/stat")
+    return 0
+  fi
+  if grep -q 'HTTP error 40[13]\|Unauthorized\|Forbidden' "$rclone_err"; then rclone_fail "$rclone_status" "checking $2"; fi
+  case "$rclone_status" in 3|4) return 1 ;; esac
+  # rclone 1.7x reports a missing object as exit 1 with "not found"; treat that as absent too.
+  if grep -qi 'not found' "$rclone_err"; then return 1; fi
+  rclone_fail "$rclone_status" "checking $2"
+}
+
+local_size() { wc -c < "$1" | tr -d '[:space:]'; }
+
+# ---- commands --------------------------------------------------------------------------------
+
+cmd_login() {
+  command -v jq >/dev/null 2>&1 || fail 1 "jq is required; $install_hint"
+  case "${1:-}" in
+    --stdin) new_key=$(tr -d '[:space:]') ;;
+    --key-file)
+      [ -n "${2:-}" ] || fail "$ex_usage" "usage: shade login --key-file <path>"
+      [ -r "$2" ] || fail "$ex_usage" "cannot read $2"
+      new_key=$(tr -d '[:space:]' < "$2") ;;
+    *) fail "$ex_usage" "usage: shade login (--stdin | --key-file <path>); the key is never passed as an argument" ;;
+  esac
+  [ -n "$new_key" ] || fail "$ex_usage" "no key was read"
+  key=$new_key; key_source="the key being stored"
+  api_get /workspaces
+  store_key "$new_key"
+  count=$(jq 'length' "$body_file")
+  names=$(jq -r '[.[] | .name // .id] | join(", ")' "$body_file")
+  printf 'Shade login stored in %s (owner-only). The key sees %s workspace(s): %s\n' "$credentials_file" "$count" "$names"
+  [ -z "${SHADE_API_KEY:-}" ] || printf 'warning: SHADE_API_KEY is set and takes precedence over the stored key\n' >&2
+}
+
+cmd_logout() {
+  if [ -f "$credentials_file" ]; then rm -f "$credentials_file"; printf 'removed %s\n' "$credentials_file"
+  else printf 'no stored Shade key\n'; fi
+  [ -z "${SHADE_API_KEY:-}" ] || printf 'warning: SHADE_API_KEY is still set in this environment\n' >&2
+}
+
+cmd_status() {
+  ok=0
+  if version=$(rclone_version_ok); then printf 'rclone   ok  %s\n' "$version"
+  elif [ -n "${version:-}" ]; then printf 'rclone   too old (%s; need %s.%s+): %s\n' "$version" "$rclone_min_major" "$rclone_min_minor" "$install_hint"; ok=1
+  else printf 'rclone   missing: %s\n' "$install_hint"; ok=1; fi
+  if command -v jq >/dev/null 2>&1; then printf 'jq       ok\n'; else printf 'jq       missing: %s\n' "$install_hint"; ok=1; fi
+  have_key=1
+  if [ -n "${SHADE_API_KEY:-}" ]; then printf 'key      from SHADE_API_KEY\n'
+  elif [ -s "$credentials_file" ]; then printf 'key      from %s\n' "$credentials_file"
+  else
+    # shellcheck disable=SC2016 # the backticks are literal, quoting the command for the reader
+    printf 'key      missing: set SHADE_API_KEY, or run `shade login --stdin` (the user runs it in their own terminal; see reference/providers/shade.md)\n'; have_key=0
+  fi
+  [ "$ok" -eq 0 ] || exit 1
+  [ "$have_key" -eq 1 ] || exit "$ex_auth"
+  load_key
+  api_get /workspaces
+  printf 'access   %s workspace(s): %s\n' "$(jq 'length' "$body_file")" "$(jq -r '[.[] | .name // .id] | join(", ")' "$body_file")"
+}
+
+cmd_ls() {
+  [ -n "${1:-}" ] || fail "$ex_usage" "usage: shade ls <drive> [path]"
+  check_uuid "drive id" "$1"
+  path=$(drive_path "${2:-/}")
+  run_rclone "$1" lsf --format sp --separator "  " ":shade:${path#/}" || rclone_fail "$rclone_status" "listing $path"
+}
+
+cmd_upload() {
+  [ $# -ge 3 ] || fail "$ex_usage" "usage: shade upload <drive> <file> <dest-path> [--force]"
+  drive=$1; file=$2; dest=$(drive_path "$3"); force=${4:-}
+  case "$force" in ""|--force) ;; *) fail "$ex_usage" "unknown option $force; only --force is accepted" ;; esac
+  check_uuid "drive id" "$drive"
+  if [ ! -f "$file" ] || [ ! -r "$file" ]; then fail "$ex_usage" "not a readable file: $file"; fi
+  case "$dest" in */) fail "$ex_usage" "dest-path names the file on the drive, including its name: $dest ends with /" ;; esac
+  size=$(local_size "$file")
+  [ "$size" -gt 0 ] || fail "$ex_usage" "$file is empty"
+  if remote_size "$drive" "$dest"; then
+    existing=$remote_result
+    [ "$existing" != "dir" ] || fail "$ex_conflict" "$dest is a folder on the drive; name the file inside it"
+    [ "$force" = "--force" ] || fail "$ex_conflict" "$dest exists on the drive ($existing bytes); pass --force to replace it, or choose another path"
+    run_rclone "$drive" copyto --ignore-times "$file" ":shade:${dest#/}" || rclone_fail "$rclone_status" "uploading $file"
+  else
+    run_rclone "$drive" copyto "$file" ":shade:${dest#/}" || rclone_fail "$rclone_status" "uploading $file"
+  fi
+  remote_size "$drive" "$dest" || fail 1 "upload finished but $dest is not on the drive; check the Shade app"
+  after=$remote_result
+  [ "$after" = "$size" ] || fail 1 "size mismatch after upload: local $size bytes, drive $after bytes; the file on the drive is suspect"
+  printf 'uploaded  %s bytes  %s\n' "$size" "$dest"
+}
+
+cmd_download() {
+  [ $# -ge 3 ] || fail "$ex_usage" "usage: shade download <drive> <path> <out> [--force]"
+  drive=$1; path=$(drive_path "$2"); out=$3; force=${4:-}
+  case "$force" in ""|--force) ;; *) fail "$ex_usage" "unknown option $force; only --force is accepted" ;; esac
+  check_uuid "drive id" "$drive"
+  if [ -e "$out" ] && [ "$force" != "--force" ]; then fail "$ex_conflict" "$out exists locally; pass --force to replace it, or choose another path"; fi
+  remote_size "$drive" "$path" || fail "$ex_not_found" "$path: not found on the drive"
+  expected=$remote_result
+  [ "$expected" != "dir" ] || fail "$ex_usage" "$path is a folder; download names one file"
+  run_rclone "$drive" copyto --ignore-times ":shade:${path#/}" "$out" || rclone_fail "$rclone_status" "downloading $path"
+  got=$(local_size "$out")
+  [ "$got" = "$expected" ] || fail 1 "size mismatch after download: drive $expected bytes, local $got bytes"
+  printf 'downloaded  %s bytes  %s\n' "$got" "$out"
+}
+
+cmd_url() {
+  [ $# -ge 2 ] || fail "$ex_usage" "usage: shade url <drive> <path>"
+  check_uuid "drive id" "$1"
+  path=$(drive_path "$2")
+  # Two calls: the path (which the REST API addresses as /<drive id><drive-relative path>) resolves
+  # to an asset id, and the asset signs a URL for its original bytes. A folder has no asset, so it
+  # comes back 404 like a missing file. The URL is valid for one day (X-Amz-Expires=86400).
+  api_get "/assets/path?drive_id=$1&path=$(urlencode "/$1$path")"
+  asset_id=$(jq -r '.id // empty' "$body_file")
+  # the id goes into a URL path, so anything but a UUID is a server anomaly, reported with its body
+  case "$asset_id" in
+    *[!0-9a-fA-F-]*|"") fail 1 "unexpected response for $path: $(head -c 300 "$body_file")" ;;
+  esac
+  api_get "/assets/$asset_id/download?drive_id=$1&origin_type=SOURCE&download=true"
+  url=$(jq -r 'if type == "string" then . else empty end' "$body_file")
+  case "$url" in
+    http://*|https://*) printf '%s\n' "$url" ;;
+    *) fail 1 "unexpected response for $path: $(head -c 300 "$body_file")" ;;
+  esac
+}
+
+# ---- dispatch ----------------------------------------------------------------------------------
+
+command=${1:-}
+[ $# -gt 0 ] && shift
+case "$command" in
+  ""|-h|--help|help) usage; [ "$command" != "" ] || exit "$ex_usage" ;;
+  login) cmd_login "$@" ;;
+  logout) cmd_logout ;;
+  status) cmd_status ;;
+  workspaces) require_tools; load_key; print_workspaces ;;
+  drives)
+    require_tools; load_key
+    case "${1:-}" in
+      "") print_drives ;;
+      --workspace) [ -n "${2:-}" ] || fail "$ex_usage" "usage: shade drives [--workspace <id>]"; print_drives "$2" ;;
+      *) fail "$ex_usage" "usage: shade drives [--workspace <id>]" ;;
+    esac ;;
+  ls) require_tools; load_key; cmd_ls "$@" ;;
+  upload) require_tools; load_key; cmd_upload "$@" ;;
+  download) require_tools; load_key; cmd_download "$@" ;;
+  url) require_tools; load_key; cmd_url "$@" ;;
+  *) usage >&2; fail "$ex_usage" "unknown command: $command" ;;
+esac

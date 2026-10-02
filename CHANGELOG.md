@@ -1,5 +1,32 @@
 # Changelog
 
+## 0.7.0
+
+- A `storage-providers` skill moves files between a StarZero library and an external storage
+  provider, starting with Shade (shade.inc), in both directions: a render or original goes from
+  `output url` or `media download` through a temporary folder into a Shade drive, and a drive file
+  comes into a library as a signed URL for `media import`, which the StarZero server fetches
+  straight from Shade (the faster route), or through `ingest-media`'s upload path as the fallback. Shade's connector and SDK cannot upload, so the bytes go through rclone's
+  native Shade backend and the listing through Shade's REST API.
+- `scripts/shade`: `login`, `logout`, `status`, `workspaces`, `drives`, `ls`, `upload`,
+  `download`, `url`. The Shade key lives in `~/.starzero/shade-credentials` (0600) or
+  `SHADE_API_KEY`, reaches curl through stdin and rclone through the environment, and appears on no
+  command line; no `rclone.conf` is read or written. Transfers are verified by size (Shade keeps
+  no hashes); an existing destination is refused until `--force`; nothing deletes, trashes or
+  syncs. Runs under Git Bash on Windows, where the credentials mode check is skipped as the CLI
+  does. Exit codes follow the CLI table, with rclone's own codes mapped so a 3 always means the
+  key. `test/shade.sh` runs it offline against fake `curl` and `rclone`; `test/shade-live.sh` is
+  the opt-in live run against a real account (a stored key, rclone, jq and the network; CI skips
+  it), with `--roundtrip` to download a drive file, re-upload it and compare the bytes.
+- The user installs rclone (1.73 or newer) and jq; the plugin downloads nothing for Shade, and
+  `shade status` prints the install hint. `reference/providers/shade.md` is the Shade document:
+  tools, the key, ids and paths, the subcommands, and what stays in the Shade app. README
+  discloses the two Shade hosts, the object-storage host behind Shade's presigned URLs, and the
+  credential file.
+- The chat skill says what `--content` is for: a handful of named items, up to about ten. A chat
+  without it covers the whole library, and a wider selection goes into the brief as a filter
+  ("only the customer interviews") rather than as a list of hundreds of media ids.
+
 ## 0.6.3
 
 - An edit of a video in a library goes through the chat skill: its description now carries the phrases an

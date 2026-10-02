@@ -16,7 +16,7 @@ jobs:
       - name: Install the Claude Code CLI and shellcheck
         run: |
           npm install --global @anthropic-ai/claude-code
-          sudo apt-get update -qq && sudo apt-get install -y -qq shellcheck
+          sudo apt-get update -qq && sudo apt-get install -y -qq shellcheck jq
       - name: Validate the plugin and marketplace manifests
         run: |
           claude plugin validate . --strict
@@ -29,3 +29,5 @@ jobs:
         run: test/session-start.sh
       - name: Launcher installs the pinned CLI
         run: test/launcher.sh
+      - name: The shade script behaves offline against fake curl and rclone
+        run: test/shade.sh
