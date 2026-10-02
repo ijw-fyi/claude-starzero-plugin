@@ -67,3 +67,7 @@ A key for every skill: `profile:read`, `billing:read`, `library:read`, `library:
 ## Credential hygiene
 
 The credential stays in the credentials file or the environment. An API key in that file is a long-lived secret and a browser token lasts 5 days; on a shared machine, `STARZERO_API_KEY` set for the session keeps the key out of the file. Skills reach it only through `starzero` commands, keeping it out of output, logs and URLs; `media url` and `output url` exist so links carry no credential. An API key the user typed into the chat stays in that conversation's history; say so once, and point at the API keys page for making a new key and revoking the old one.
+
+## Other credentials
+
+The Shade key used by the storage-providers skill is a separate credential with its own store (`~/.starzero/shade-credentials`) and its own `login`; `${CLAUDE_PLUGIN_ROOT}/reference/providers/shade.md` covers it. A 3 from `scripts/shade` is about that key, a 3 from `starzero` is about the login above.
