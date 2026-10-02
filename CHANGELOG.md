@@ -25,7 +25,7 @@
   credential file.
 - The chat skill says what `--content` is for: a handful of named items, up to about ten. A chat
   without it covers the whole library, and a wider selection goes into the brief as a filter
-  ("only the interviews in /raw/q3") rather than as a list of hundreds of media ids.
+  ("only the customer interviews") rather than as a list of hundreds of media ids.
 
 ## 0.6.3
 
