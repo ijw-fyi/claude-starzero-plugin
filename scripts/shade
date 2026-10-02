@@ -284,7 +284,7 @@ cmd_upload() {
   drive=$1; file=$2; dest=$(drive_path "$3"); force=${4:-}
   case "$force" in ""|--force) ;; *) fail "$ex_usage" "unknown option $force; only --force is accepted" ;; esac
   check_uuid "drive id" "$drive"
-  [ -f "$file" ] && [ -r "$file" ] || fail "$ex_usage" "not a readable file: $file"
+  if [ ! -f "$file" ] || [ ! -r "$file" ]; then fail "$ex_usage" "not a readable file: $file"; fi
   case "$dest" in */) fail "$ex_usage" "dest-path names the file on the drive, including its name: $dest ends with /" ;; esac
   size=$(local_size "$file")
   [ "$size" -gt 0 ] || fail "$ex_usage" "$file is empty"
