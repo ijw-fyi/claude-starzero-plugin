@@ -8,7 +8,7 @@
 | folder | a path such as `/raw/interviews`, not an id | `folder list`, `folder create` | `--folder`, `--to`, `--path` |
 | media | 24-hex | `media list`, `media get`, `media upload` and `media import` rows, search hits (`mediaId`), `next.watch` | `media get/move/url/download/thumbnail/watch`, `--media` on `search`, `workflow instance create`, `podcast-clips create`; `chat create --content` |
 | template | 24-hex | `workflow template list`, `workflow template describe` | `workflow instance create --template`, `workflow instance list --template` |
-| instance | 24-hex | `workflow instance create/list`, `podcast-clips create/list` (a podcast run is an instance) | `workflow instance get/watch/cancel` |
+| instance | 24-hex | `workflow instance create/list`, `podcast-clips create/list` (a podcast run is an instance) | `workflow instance get/watch/share/cancel` |
 | session (a workflow branch) | chat-shaped string | instance views (`sessions`, `outputs[].sessionId`) | only the chat link the CLI prints; `chat send` to a branch session is not supported |
 | chat | 1 to 64 URL-safe characters | `chat create`, `chat list` | `chat get/send/renders`, `artifact list --chat` |
 | render | 24-hex | instance views (`outputs[].renderId`), `chat renders` | `output url`, `output share` |
@@ -30,7 +30,8 @@ Pass links through as printed; composing one by hand is unsupported.
 | API keys page | `auth login --help`, hints | where the user mints a key |
 | instance page (`link` / `appUrl`) | instance views | the run with its rendered videos |
 | chat page (`appUrl`, `chatUrl`) | `chat create/get/send`, instance views per session and per output | the transcript; for a workflow run, the branch that produced an output, which is where a failed branch is diagnosed |
-| share page (`page`) | `output share` | public link to a render, with an expiry |
+| run share page (`sharePage`, `page`) | instance views once shared, `workflow instance share` | public link to every output of a run, with no expiry, until `--off` |
+| render share page (`page`) | `output share` | public link to a render, with an expiry |
 
 ## Folders
 

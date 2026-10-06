@@ -24,7 +24,7 @@ In human mode the same facts appear as the table, then `warning: ...` lines, the
 ```
 
 - `warnings` lists things that happened but did not stop the command. Read it: `instance create` reports "variables were not validated" there, and the run has started anyway.
-- `next` holds the exact follow-up commands (`watch`, `url`, `share`). Run those verbatim instead of composing your own.
+- `next` holds the exact follow-up commands (`watch`, `shareRun`, `url`, `share`). Run those verbatim instead of composing your own.
 
 Error, on stderr:
 

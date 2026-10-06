@@ -22,7 +22,7 @@ Starts one run of an existing StarZero workflow template on a library or a chose
 5. Check for an active run before starting one. Runs draw on the shared credit balance as they go, so two runs in flight can both fail from credit exhaustion where one alone would have finished, and spent credits stay spent. Podcast-clip runs are workflow instances too, so they count. Run `starzero workflow instance list --status queued` and `starzero workflow instance list --status pending`; any row means a run is active. Finish it first: watch it to completion with `starzero workflow instance watch <instanceId>` (or let the user cancel it), then start the new one. When the user insists on a parallel run, say what can happen and go with their answer.
 6. State the billing (next section), then start the run once: `starzero workflow instance create --template <templateId> --library <libraryId> [--media <id...>] --variables vars.json [--name <name>]`, without `--watch`. Read the exit code first, then `warnings` (`variables were not validated` means the run started anyway) and `next.watch`.
 7. Watch as a separate command. Read `${CLAUDE_PLUGIN_ROOT}/reference/waiting.md` before the first watch. Run the `next.watch` command, `starzero workflow instance watch <instanceId>`, in the background, as `waiting.md` describes. Add `--progress` when the user wants one status line per poll on stderr.
-8. Final view: `starzero workflow instance get <instanceId>`. Read `${CLAUDE_PLUGIN_ROOT}/reference/renders.md` before handing back links, then run the `next.url` or `next.share` command as printed, or hand over to `/starzero:share-render`.
+8. Final view: `starzero workflow instance get <instanceId>`. Read `${CLAUDE_PLUGIN_ROOT}/reference/renders.md` before handing back links, then run the `next` command as printed: `next.shareRun` when the user wants to share the run or its outputs (one public page for the whole run, no expiry, `--off` takes it back), `next.url` or `next.share` for one render; or hand over to `/starzero:share-render`.
 9. On the user's request only: `starzero workflow instance cancel <instanceId>` stops a run; credits already spent stay spent. `starzero workflow instance list --template <templateId> --status <status>` answers "what have I run" and "is my run finished".
 
 See `starzero workflow template <command> --help` and `starzero workflow instance <command> --help` for the rest of the flags.
@@ -38,7 +38,7 @@ See `starzero workflow template <command> --help` and `starzero workflow instanc
 
 ## What to report
 
-From the `get` view: status, `creditsUsed`, the app link as printed, the sessions table with one chat link per branch (a failed branch is diagnosed from its chat link), and `outputs[].renderId` with the `next.url` and `next.share` commands. Pass every link through as the CLI printed it. Deleting a run happens in the StarZero app; the CLI has no delete command.
+From the `get` view: status, `creditsUsed`, the app link as printed, the sessions table with one chat link per branch (a failed branch is diagnosed from its chat link), `outputs[].renderId` with the `next.shareRun`, `next.url` and `next.share` commands, and the `share` line (the run's public page) once the run is shared. Pass every link through as the CLI printed it. Deleting a run happens in the StarZero app; the CLI has no delete command.
 
 ## Failure modes
 
