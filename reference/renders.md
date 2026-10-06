@@ -18,7 +18,7 @@ JSON shapes: `url` returns `{ "renderId", "file", "url", "expiresInSeconds" }`; 
 
 Neither URL contains the API key, so both are safe to paste.
 
-A whole run has its own public page: `workflow instance share <instanceId>` returns `{ "instanceId", "shared", "page", "status", "isDone" }` with `page` at `https://share.starzero.ai/i/<instanceId>`, which lists every output of the run and has no expiry; `--off` clears it and the page no longer shows the run. Run views carry `shared` and `sharePage`, print `share` when shared, and a finished unshared run adds `next.shareRun`.
+A whole run has its own public page: `workflow instance share <instanceId>` returns `{ "instanceId", "shared", "page", "status", "isDone" }` with `page` at `https://share.starzero.ai/i/<instanceId>`, which lists every output of the run and stays up until `--off` clears it, after which the page no longer shows the run. Run views carry `shared` and `sharePage` (printed as `share` in human output when shared), and a finished unshared run adds `next.shareRun`.
 
 ## Temporary renders from moments
 

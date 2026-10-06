@@ -25,8 +25,8 @@ Hands a StarZero render over as a link: a public share page for sending, or a si
    - A link to send to someone: `starzero output share <renderId>` prints `page` (the public share page), `video` (the direct mp4) and `expiresAt`. Default and maximum expiry 7 days; `--expires <seconds>` shortens it.
    - A download or a private link: `starzero output url <renderId>` prints `url` and `expiresInSeconds`. Default expiry 1 day, `--expires <seconds>` up to 7 days; `--thumbnail` returns the webp still instead of the mp4. Download with `curl -o <file> "<url>"`.
    - See `starzero output share --help` and `starzero output url --help` for the rest.
-   - Every output of one run on a single public page: `starzero workflow instance share <instanceId>` prints `page` (`https://share.starzero.ai/i/<instanceId>`), `shared` and the run's `status`; the page has no expiry and stays up until `starzero workflow instance share <instanceId> --off` takes it back. Sharing a run that is still going warns that the page fills in as outputs land. A finished, unshared run prints the exact command as `next.shareRun`; a shared run shows its page as `share` on every run view. Podcast runs are runs, so this covers "share the clips" for a whole episode.
-4. Neither URL contains the API key; both are safe to paste. Both commands are free.
+   - Every output of one run on a single public page: `starzero workflow instance share <instanceId>` prints `page` (`https://share.starzero.ai/i/<instanceId>`), `shared` and the run's `status`; the page stays up until `starzero workflow instance share <instanceId> --off` takes it back. Sharing a run that is still going warns that the page fills in as outputs land. A finished, unshared run prints the exact command as `next.shareRun`; a shared run shows its page as `sharePage` on every run view. Podcast runs are runs, so this covers "share the clips" for a whole episode.
+4. None of these links contains the API key; all are safe to paste. All three commands are free.
 5. An expired link: run the same `output share` or `output url` command again; each run signs a fresh link.
 6. A temporary render from `output render` has only the URL the command printed (valid about a day); it has no record, so `output url` and `output share` cannot serve it. Download it with `curl -o` while the URL is valid, or run the same `output render` command again for a fresh one (watermarked is free).
 7. Files a chat used or produced are artifacts, not renders: `starzero artifact list --chat <chatId>` lists them and `starzero artifact url <type>/<id>` prints their presigned URL.
@@ -38,7 +38,7 @@ Hands a StarZero render over as a link: a public share page for sending, or a si
 ## What to report
 
 - Which render each link belongs to: the run and branch (with its chat link) or the chat, as the view printed them.
-- The links exactly as the CLI printed them, with their expiry (`expiresAt` or `expiresInSeconds`).
+- The links exactly as the CLI printed them, with their expiry (`expiresAt` or `expiresInSeconds`) where the command has one.
 - For `output url`: that it is private and expires; for `output share`: that anyone with the page link can open it until `expiresAt`.
 - For `workflow instance share`: that anyone with the page link can open it until the user runs the command with `--off`.
 - For a downloaded file: the local path `curl -o` wrote.
