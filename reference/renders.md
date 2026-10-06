@@ -5,18 +5,21 @@ A render is a video StarZero produced. Kept renders come from workflow runs, pod
 - `workflow instance get <id>` and `workflow instance watch <id>`: `outputs[].renderId`, one per finished branch, each with the chat link of the branch that made it;
 - `chat renders <chatId>`: the videos a chat rendered.
 
-Every view with outputs sets `next.url` and `next.share` to the exact commands for the first render.
+Every view with outputs sets `next.url` and `next.share` to the exact commands for the first render; a finished run that is not shared also sets `next.shareRun` to its `workflow instance share` command. Every instance view carries `shared` and `sharePage` (the run's public page, null until shared).
 
-## Two ways to hand a render over
+## Three ways to hand output over
 
 | Command | Gives | Default expiry | Max | Use when |
 | --- | --- | --- | --- | --- |
+| `workflow instance share <instanceId>` | one public page for every output of the run, `https://share.starzero.ai/i/<instanceId>`; `--off` takes it back | none | none | the user wants to share a run or its clips |
 | `output url <renderId>` | a signed private URL to the mp4 (`--thumbnail` for the still) | 1 day | 7 days | the user wants to download it, or you pipe it to `curl -o` |
 | `output share <renderId>` | a public share page plus a direct mp4 link, both with an expiry | 7 days | 7 days | the user wants a link to send to someone |
 
-JSON shapes: `url` returns `{ "renderId", "file", "url", "expiresInSeconds" }`; `share` returns `{ "renderId", "page", "video", "expiresAt" }`. `--expires` takes seconds, up to 604800; a larger value is a usage error.
+JSON shapes: `instance share` returns `{ "instanceId", "shared", "page", "status", "isDone" }` (`page` is null after `--off`); `url` returns `{ "renderId", "file", "url", "expiresInSeconds" }`; `share` returns `{ "renderId", "page", "video", "expiresAt" }`. `--expires` takes seconds, up to 604800; a larger value is a usage error.
 
-Neither URL contains the API key, so both are safe to paste.
+The run page is the route for "share the run" and "share the clips": a podcast run is an instance, so it is shared the same way. Sharing a run that is still going warns that the page fills in as outputs land; sharing a shared run changes nothing and prints the same page. A chat's renders belong to no run, so `output share` is their share route. All three commands are free.
+
+None of these links contains the API key, so all are safe to paste.
 
 ## Temporary renders from moments
 

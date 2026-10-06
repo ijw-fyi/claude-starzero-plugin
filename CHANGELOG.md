@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.7.1
+
+- CLI pinned at 0.10.0: `starzero workflow instance share <instanceId>` makes a run's outputs
+  public at `https://share.starzero.ai/i/<instanceId>` with no expiry, and `--off` takes the page
+  back. Every instance view shows `shared` and `sharePage`, and a finished unshared run with outputs
+  carries a `next.shareRun` hint. The share-render skill makes it the route for "share the run" and
+  "share the clips" (podcast runs included), keeps `output share` for one render or an expiring
+  link, and reports that the page is public until `--off`; run-workflow and podcast-clips hand the
+  `next.shareRun` command back with the others. `renders.md`, `ids-and-links.md` and
+  `cli-conventions.md` gain the run page.
+
 ## 0.7.0
 
 - A `storage-providers` skill moves files between a StarZero library and an external storage

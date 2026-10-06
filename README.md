@@ -1,7 +1,7 @@
 # StarZero plugin for Claude Code
 
 Upload media to StarZero or import it from video URLs, search transcripts and what is on screen,
-run workflow templates, cut podcast clips, chat with the StarZero agent, share renders and move
+run workflow templates, cut podcast clips, chat with the StarZero agent, share runs and renders, and move
 files to and from external storage such as Shade, from
 Claude Code, Cowork and claude.ai chat. Where there is a shell, the plugin drives the
 [`starzero` command-line tool](https://github.com/ijw-fyi/starzero-cli-releases) and installs it
@@ -52,7 +52,7 @@ estimate before uploads and checks a graphic rendered as MP4 before it is handed
 | `starzero:run-workflow` | "run the highlights template on last week's uploads" |
 | `starzero:podcast-clips` | "cut this episode into five vertical clips with captions" |
 | `starzero:chat` | "trim this interview to 60 seconds, 9:16, with captions", "add a lower-third with her name", "ask the StarZero agent to make a two-minute recap of this library", "find every product mention across all interviews", "make an animated intro with a voiceover and music for this episode" (an edit of library video goes through the agent, which works across the whole library in one chat and generates video, voiceover, music and images; Claude makes the designed graphics itself and hands them over for placement) |
-| `starzero:share-render` | "give me a link to the video", "download the output" |
+| `starzero:share-render` | "share the run", "give me a link to the video", "download the output" |
 | `starzero:storage-providers` | "upload this render to our Shade drive", "list my Shade drives", "pull this clip from Shade into StarZero" (Shade is the first provider; you install rclone and jq, the plugin downloads nothing for it) |
 | `starzero:setup` | install, log in, check scopes (you run this one yourself) |
 

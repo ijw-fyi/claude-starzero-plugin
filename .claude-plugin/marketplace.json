@@ -11,7 +11,7 @@
     {
       "name": "starzero",
       "description": "Upload media to StarZero, search transcripts and visuals, run workflow templates, cut podcast clips, share renders and move files to and from external storage such as Shade, through the starzero CLI, or through the StarZero connector on claude.ai chat.",
-      "version": "0.7.0",
+      "version": "0.7.1",
       "source": "./",
       "category": "productivity",
       "keywords": ["starzero", "video", "media", "transcript", "search", "workflow", "podcast", "clips"]
