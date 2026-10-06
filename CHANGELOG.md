@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.7.1
+
+- The storage-providers skill, `scripts/shade`, `reference/providers/shade.md` and the two shade
+  tests are removed; the plugin moves no files to or from external storage and contacts no Shade
+  host. A Shade key stored by 0.7.0 is still at `~/.starzero/shade-credentials` (or under
+  `$STARZERO_CONFIG_DIR`); delete that file yourself. The chat skill's `--content` rule from
+  0.7.0 stays.
+- The pinned CLI is 0.10.0, which adds `workflow instance share <instanceId>`: a run's outputs on
+  one public page at `share.starzero.ai/i/<instanceId>`, with `--off` to take it back. The
+  share-render skill and `reference/renders.md` cover it next to the per-render links; run views
+  now print `shared`, `sharePage` and a `next.shareRun` hint on a finished unshared run.
+
 ## 0.7.0
 
 - A `storage-providers` skill moves files between a StarZero library and an external storage

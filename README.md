@@ -1,8 +1,7 @@
 # StarZero plugin for Claude Code
 
 Upload media to StarZero or import it from video URLs, search transcripts and what is on screen,
-run workflow templates, cut podcast clips, chat with the StarZero agent, share renders and move
-files to and from external storage such as Shade, from
+run workflow templates, cut podcast clips, chat with the StarZero agent and share renders, from
 Claude Code, Cowork and claude.ai chat. Where there is a shell, the plugin drives the
 [`starzero` command-line tool](https://github.com/ijw-fyi/starzero-cli-releases) and installs it
 for you; on claude.ai chat it offers the StarZero connector, a remote MCP server with the same
@@ -53,7 +52,6 @@ estimate before uploads and checks a graphic rendered as MP4 before it is handed
 | `starzero:podcast-clips` | "cut this episode into five vertical clips with captions" |
 | `starzero:chat` | "trim this interview to 60 seconds, 9:16, with captions", "add a lower-third with her name", "ask the StarZero agent to make a two-minute recap of this library", "find every product mention across all interviews", "make an animated intro with a voiceover and music for this episode" (an edit of library video goes through the agent, which works across the whole library in one chat and generates video, voiceover, music and images; Claude makes the designed graphics itself and hands them over for placement) |
 | `starzero:share-render` | "give me a link to the video", "download the output" |
-| `starzero:storage-providers` | "upload this render to our Shade drive", "list my Shade drives", "pull this clip from Shade into StarZero" (Shade is the first provider; you install rclone and jq, the plugin downloads nothing for it) |
 | `starzero:setup` | install, log in, check scopes (you run this one yourself) |
 
 Skills trigger on their own from what you say; `/starzero:<skill>` runs one directly.
@@ -82,14 +80,7 @@ starting a second run while one is active.
   checksums, stored next to the CLI.
 - Hosts contacted: `github.com` and its release downloads for the two binaries; StarZero's own API
   (`api.starzero.ai`) and app (`app.starzero.ai`) for everything the skills do; `mcp.starzero.ai`
-  only where the connector is used. Your StarZero credential is sent only to StarZero. When you use
-  the storage-providers skill with Shade, `scripts/shade` contacts Shade's API (`api.shade.inc`)
-  for listing, the key check and signed download URLs, and runs rclone against Shade's transfer
-  API (`fs.shade.inc`) and the object-storage host that Shade's presigned upload and download URLs
-  name; your Shade key goes only to Shade. Bringing a drive file into a StarZero library hands
-  StarZero a signed download URL for that one file (valid one day), which its server fetches from
-  Shade's storage; the fallback moves the file through your machine instead. rclone (1.73 or newer)
-  and jq are tools you install yourself; the plugin downloads neither. When you hand the
+  only where the connector is used. Your StarZero credential is sent only to StarZero. When you hand the
   plugin a playlist, channel or folder URL and `yt-dlp` is installed on your machine, Claude runs
   it to list the video URLs, so that page is fetched from your machine; the videos themselves are
   fetched by StarZero's servers. The plugin installs nothing for this.
@@ -98,13 +89,7 @@ starting a second run while one is active.
   the platform and which kind of credential was in use; never your arguments, files, keys or
   tokens. It prints the report's event id. `DO_NOT_TRACK=1` or an empty `STARZERO_SENTRY_DSN=`
   in your environment turns it off.
-- A Shade API key, if you store one, lives in `~/.starzero/shade-credentials` (or under
-  `$STARZERO_CONFIG_DIR`), one line with mode 0600, written by `scripts/shade login --stdin` in
-  your own terminal (Git Bash on Windows) and removed by `scripts/shade logout`; on macOS and
-  Linux the script refuses the file when other users can read it. `SHADE_API_KEY` in the
-  environment is read first. The script hands it to curl and rclone without putting it on a command line, and
-  reads or writes no `rclone.conf`.
-- Your StarZero credential lives in `~/.starzero/credentials` (or under `$STARZERO_CONFIG_DIR`), one line
+- Your credential lives in `~/.starzero/credentials` (or under `$STARZERO_CONFIG_DIR`), one line
   with mode 0600, on every platform; on macOS and Linux the CLI refuses the file when other users
   can read it. `starzero auth logout` removes it and revokes a browser login token. CLI versions
   before 0.8.0 used the OS keychain, and the CLI leaves that item alone: to remove it, delete the
@@ -156,7 +141,6 @@ claude --plugin-dir .          # load the working tree for one session
 claude plugin validate . --strict
 test/launcher.sh               # downloads the pinned CLI into a temp HOME and runs it
 test/session-start.sh          # the SessionStart hook speaks only without a credential
-test/shade.sh                  # scripts/shade against fake curl and rclone on PATH (needs jq)
 scripts/check-versions.sh
 ```
 

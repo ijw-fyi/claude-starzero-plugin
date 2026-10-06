@@ -27,7 +27,7 @@ Warnings worth relaying: several video or audio streams, more than two audio cha
 
 ## From URLs (`media import`)
 
-`starzero media import --library <id> [--folder /path] <url...>` creates one media per video URL (YouTube, Google Drive, Frame.io, Facebook, most sites yt-dlp reads) or per direct file URL (an `https` link whose body is the video file, such as the signed URL `shade url` prints for a Shade drive file); the server fetches the video itself, so no bytes leave the machine. It returns once the server has taken the videos, which takes up to minutes for a long list; processing then continues as after an upload, and `next.watch` carries the same `media watch` command. `--folder`, `--name` (single URL), `--meta`, `--watch` and `--events` work as on `media upload`.
+`starzero media import --library <id> [--folder /path] <url...>` creates one media per video URL (YouTube, Google Drive, Frame.io, Facebook, most sites yt-dlp reads); the server fetches the video itself, so no bytes leave the machine. It returns once the server has taken the videos, which takes up to minutes for a long list; processing then continues as after an upload, and `next.watch` carries the same `media watch` command. `--folder`, `--name` (single URL), `--meta`, `--watch` and `--events` work as on `media upload`.
 
 What differs from an upload:
 

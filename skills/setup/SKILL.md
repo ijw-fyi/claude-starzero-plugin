@@ -27,7 +27,6 @@ Installs the pinned `starzero` CLI and ffprobe, logs the user in, then checks th
    Then re-run `starzero auth status`.
 5. When the credential is an API key: ask which jobs the user plans (upload, search, workflows, podcast clips, chat, sharing renders) and compare its scopes from step 3 with the jobs table in `auth.md`. A missing scope means a new key from the API keys page, since scopes cannot be added to an existing key, or a browser login, which carries them all. A browser token needs no scope check; mention its expiry date from step 3.
 6. Smoke test and balance: `starzero credits` (free, needs `billing:read`) shows `creditsLeft`, the plan and the credit notes with their expiries; relay them. `starzero library list` (free, `library:read`) confirms library access.
-7. External storage (Shade) is not part of this setup: the storage-providers skill checks its own tools and key with `${CLAUDE_PLUGIN_ROOT}/scripts/shade status` when it is first used, and `reference/providers/shade.md` says how the user installs rclone and stores the Shade key.
 
 ## Billing
 

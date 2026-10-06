@@ -1,12 +1,12 @@
 ---
 name: share-render
-description: 'Turns a StarZero render id into a public share page link to send, or a signed private mp4 or thumbnail URL to download, each with an expiry, and finds render ids from a workflow run, podcast run or chat. Use when the user says "give me a link to the video", "share the clips", "download the output", "where are my rendered videos", "the share link expired" or "thumbnail of that render".'
+description: 'Turns a StarZero render id into a public share page link to send, or a signed private mp4 or thumbnail URL to download, each with an expiry, and finds render ids from a workflow run, podcast run or chat. Use when the user says "give me a link to the video", "share the clips", "download the output", "where are my rendered videos", "the share link expired", "thumbnail of that render" or "share the whole run".'
 argument-hint: "[render id]"
 ---
 
 # Share or download a render
 
-Hands a StarZero render over as a link: a public share page for sending, or a signed private URL for downloading, each with an expiry. When the user only has a run, a podcast run or a chat, it locates the render ids first. Argument: `$ARGUMENTS` is a render id the user already has.
+Hands a StarZero render over as a link: a public share page for sending, or a signed private URL for downloading, each with an expiry. When the user only has a run, a podcast run or a chat, it locates the render ids first. A whole run, all of its outputs on one page, is shared as the run itself rather than render by render. Argument: `$ARGUMENTS` is a render id the user already has.
 
 ## Prerequisites
 
@@ -25,6 +25,7 @@ Hands a StarZero render over as a link: a public share page for sending, or a si
    - A link to send to someone: `starzero output share <renderId>` prints `page` (the public share page), `video` (the direct mp4) and `expiresAt`. Default and maximum expiry 7 days; `--expires <seconds>` shortens it.
    - A download or a private link: `starzero output url <renderId>` prints `url` and `expiresInSeconds`. Default expiry 1 day, `--expires <seconds>` up to 7 days; `--thumbnail` returns the webp still instead of the mp4. Download with `curl -o <file> "<url>"`.
    - See `starzero output share --help` and `starzero output url --help` for the rest.
+   - Every output of one run on a single public page: `starzero workflow instance share <instanceId>` prints `page` (`https://share.starzero.ai/i/<instanceId>`), `shared` and the run's `status`; the page has no expiry and stays up until `starzero workflow instance share <instanceId> --off` takes it back. Sharing a run that is still going warns that the page fills in as outputs land. A finished, unshared run prints the exact command as `next.shareRun`; a shared run shows its page as `share` on every run view. Podcast runs are runs, so this covers "share the clips" for a whole episode.
 4. Neither URL contains the API key; both are safe to paste. Both commands are free.
 5. An expired link: run the same `output share` or `output url` command again; each run signs a fresh link.
 6. A temporary render from `output render` has only the URL the command printed (valid about a day); it has no record, so `output url` and `output share` cannot serve it. Download it with `curl -o` while the URL is valid, or run the same `output render` command again for a fresh one (watermarked is free).
@@ -32,13 +33,14 @@ Hands a StarZero render over as a link: a public share page for sending, or a si
 
 ## Billing
 
-`output url` and `output share` spend nothing. The one billed path near this skill is a fresh `output render --no-watermark` (250 credits per rendered minute); before running it, state the exact command and the summed clip length, ask once in words ("Clean render of 42 s of clips, about 175 credits, 12,400 left. Go ahead?") and wait for the answer, unless the user waived the question for the session (`credits.md`, "Waiving the question"), then run it once, with the billing line repeated in the Bash call's `description` (for example `Clean render of 42 s of clips (billed; 12,400 credits left)`).
+`output url`, `output share` and `workflow instance share` spend nothing. The one billed path near this skill is a fresh `output render --no-watermark` (250 credits per rendered minute); before running it, state the exact command and the summed clip length, ask once in words ("Clean render of 42 s of clips, about 175 credits, 12,400 left. Go ahead?") and wait for the answer, unless the user waived the question for the session (`credits.md`, "Waiving the question"), then run it once, with the billing line repeated in the Bash call's `description` (for example `Clean render of 42 s of clips (billed; 12,400 credits left)`).
 
 ## What to report
 
 - Which render each link belongs to: the run and branch (with its chat link) or the chat, as the view printed them.
 - The links exactly as the CLI printed them, with their expiry (`expiresAt` or `expiresInSeconds`).
 - For `output url`: that it is private and expires; for `output share`: that anyone with the page link can open it until `expiresAt`.
+- For `workflow instance share`: that anyone with the page link can open it until the user runs the command with `--off`.
 - For a downloaded file: the local path `curl -o` wrote.
 - Warnings from the `warnings` array, in the CLI's words.
 
