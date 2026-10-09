@@ -37,7 +37,7 @@ What differs from an upload:
 - URLs go to the server in batches of 100, in input order. An error on a later batch leaves the earlier ones imported and billed; the URLs never sent print as `skipped` (`not attempted`) under the rows that landed, and the command exits with that error.
 - A `failed` row carries no reason from the server. The hint names the likely ones (a private or removed video, a page that is not one video, a duplicate URL form); the row is relayed with that hint, and nothing else is invented.
 
-Rows: `OUTCOME  MEDIA  STATUS  URL`, outcomes `imported`, `already-imported`, `failed`, `skipped`, then a summary line. Afterwards `media get` and `media list --json` carry `origin`: in human output `upload` for a file, or the platform and the URL as it was sent (`youtube https://...`) for an import; in JSON `{ "source": "user", "type": "upload" }` or `{ "source": "external", "type": "<platform>", "url": "..." }`. So where a media came from can be told from the library later. Exit 7 `IMPORT_PARTIAL` means some URLs failed and the rest landed; exit 1 means every URL failed.
+Rows: `OUTCOME  MEDIA  STATUS  URL`, outcomes `imported`, `already-imported`, `failed`, `skipped`, then a summary line. Afterwards `media get` and `media list --json` carry `origin`: in human output `upload` for a file, or the platform and the URL as it was sent (`youtube https://...`) for an import; in JSON `{ "source": "user", "type": "upload" }` or `{ "source": "external", "type": "<platform>", "id": "<the platform's video id>", "url": "..." }`. So where a media came from can be told from the library later. Exit 7 `IMPORT_PARTIAL` means some URLs failed and the rest landed; exit 1 means every URL failed.
 
 ## Listing a page first (`media resolve`)
 
