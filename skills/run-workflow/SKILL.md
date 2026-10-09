@@ -38,7 +38,7 @@ See `starzero workflow template <command> --help` and `starzero workflow instanc
 
 ## What to report
 
-From the `get` view: status, `creditsUsed`, the app link as printed, the sessions table with one chat link per branch (a failed branch is diagnosed from its chat link), `outputs[].renderId` with the `next.shareRun`, `next.url` and `next.share` commands, and the `share` line (the run's public page) once the run is shared. Pass every link through as the CLI printed it. Deleting a run happens in the StarZero app; the CLI has no delete command.
+From the `get` view: status, `creditsUsed`, the app link as printed, the sessions table with one chat link per branch (a failed branch is diagnosed from its chat link), `outputs[].renderId` with the `next.shareRun`, `next.url` and `next.share` commands, and the `share` line (the run's public page) once the run is shared. Pass every link through as the CLI printed it. When the user asks which media the run used, re-run the view with `--library --media` and report the `media` table (name, status, duration, origin) and the library's name; it costs one assets call per selected media, so it is for that question, not for every view. Deleting a run happens in the StarZero app; the CLI has no delete command.
 
 ## Failure modes
 

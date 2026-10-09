@@ -16,7 +16,7 @@ Hands StarZero output over as a link. A workflow or podcast run is shared whole:
 ## Steps
 
 1. Take the instance id or render id from a view in this session; a typed or remembered id is the usual reason a link 404s. Find it in one of these:
-   - A workflow run: `starzero workflow instance get <instanceId>`; the view shows `shared` and `sharePage` (the run's public page, null until shared), and each finished branch is one entry in `outputs[]` with its `renderId` and the chat link of the branch that made it. The instance id comes from `starzero workflow instance list` (`--status completed` narrows it).
+   - A workflow run: `starzero workflow instance get <instanceId>`; the view shows `shared` and `sharePage` (the run's public page, null until shared), and each finished branch is one entry in `outputs[]` with its `renderId` and the chat link of the branch that made it. The instance id comes from `starzero workflow instance list` (`--status completed` narrows it). When the user asks which media a run used, or wants to tell runs apart by their inputs, add `--library --media`: the view then carries `library` (name, size) and a `media` table (id, status, duration, origin, name), one assets call for the library and one per selected media; a whole-library run has an empty `media` list, and an input deleted since the run is a warning, not an error.
    - A podcast run: `starzero podcast-clips list` prints instance ids, then the same `workflow instance get`.
    - A chat: `starzero chat renders <chatId>`; the chat id comes from `starzero chat list`.
    - A render id the user pastes: locate it in one of those views before signing it.

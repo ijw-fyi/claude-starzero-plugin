@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.7.2
+
+- CLI pinned at 0.11.0: `workflow instance get <id> --library --media` resolves a run's library
+  (name, size) and its selected media (name, status, duration, origin) next to the unchanged ids,
+  one assets call for the library and one per media; a deleted input is a warning and a
+  whole-library run has an empty `media` list. share-render, run-workflow and podcast-clips use it
+  for "which media did this run use", not on every view. `media get` and `media list --json` carry
+  `origin` (`upload`, or the platform and URL an import came from), which upload.md and
+  ingest-media name. `artifact list` no longer fails on an artifact that belongs to the account
+  rather than a chat (`chatId` null, `CHAT` column `-`), and human output sets warnings and hints
+  off from the result by two blank lines.
+
 ## 0.7.1
 
 - CLI pinned at 0.10.0: `starzero workflow instance share <instanceId>` makes a run's outputs

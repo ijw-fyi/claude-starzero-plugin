@@ -5,7 +5,7 @@ A render is a video StarZero produced. Kept renders come from workflow runs, pod
 - `workflow instance get <id>` and `workflow instance watch <id>`: `outputs[].renderId`, one per finished branch, each with the chat link of the branch that made it;
 - `chat renders <chatId>`: the videos a chat rendered.
 
-Every view with outputs sets `next.url` and `next.share` to the exact commands for the first render; a finished run that is not shared also sets `next.shareRun` to its `workflow instance share` command. Every instance view carries `shared` and `sharePage` (the run's public page, null until shared).
+Every view with outputs sets `next.url` and `next.share` to the exact commands for the first render; a finished run that is not shared also sets `next.shareRun` to its `workflow instance share` command. Every instance view carries `shared` and `sharePage` (the run's public page, null until shared). `workflow instance get <id> --library --media` adds `library` (`{ id, name, ... }`, or null when it no longer exists) and `media` (the selected media that still exist, in selection order, each with `name`, `status`, `duration` and `origin`; empty for a whole-library run) next to the unchanged `libraryId` and `mediaIds`; a missing input is named in `warnings`. One assets call for the library and one per media, so ask for them when the question is what the run worked on.
 
 ## Three ways to hand output over
 
