@@ -11,6 +11,11 @@
   ingest-media name. `artifact list` no longer fails on an artifact that belongs to the account
   rather than a chat (`chatId` null, `CHAT` column `-`), and human output sets warnings and hints
   off from the result by two blank lines.
+- The SessionStart hook speaks every session, not only without a login: with one stored it says
+  the starzero CLI is logged in and is the route to StarZero, without one it points at
+  `/starzero:setup`, and in both cases it says the bundled StarZero connector is a separate,
+  optional route. Claude Code reports that connector as unauthenticated until it is connected, and
+  Claude was taking that as StarZero being unavailable and skipping the CLI.
 
 ## 0.7.1
 
