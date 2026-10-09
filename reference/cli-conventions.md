@@ -60,6 +60,7 @@ Usage errors come in two forms: a rejected flag prints a plain `error: ...` line
 
 - `chat send` streams the reply as text and ends with a `[done in m:ss · N tool calls · C credits · N tokens in context]` footer (the JSON summary line carries the same as `context`); with `--json` it becomes one NDJSON event per tool call plus a summary line, which is more tokens for the same information. Stay in human mode unless piping.
 - `media upload --events` and `media watch --events` write NDJSON progress to stderr; `workflow instance watch --progress` writes plain lines to stderr. Stdout stays one document.
+- A line `update: starzero X.Y.Z is available ...` on stderr, before a command's output, means a newer CLI release exists than the one the plugin pins. The plugin moves its pin with its own updates: leave the line alone, run no upgrade, and read the output as usual.
 
 ## Shapes worth knowing
 

@@ -89,15 +89,20 @@ starting a second run while one is active.
   name; your Shade key goes only to Shade. Bringing a drive file into a StarZero library hands
   StarZero a signed download URL for that one file (valid one day), which its server fetches from
   Shade's storage; the fallback moves the file through your machine instead. rclone (1.73 or newer)
-  and jq are tools you install yourself; the plugin downloads neither. When you hand the
-  plugin a playlist, channel or folder URL and `yt-dlp` is installed on your machine, Claude runs
-  it to list the video URLs, so that page is fetched from your machine; the videos themselves are
-  fetched by StarZero's servers. The plugin installs nothing for this.
+  and jq are tools you install yourself; the plugin downloads neither. A playlist, channel or
+  folder URL you hand the plugin is listed by StarZero's server (`starzero media resolve`), as the
+  videos themselves are fetched by StarZero's servers; nothing about the page is fetched from your
+  machine.
 - On a crash of the CLI itself (an `INTERNAL` error, a bug), the CLI sends one report to StarZero's
   Sentry project (`ingest.us.sentry.io`): the error message, the command name, the CLI version,
   the platform and which kind of credential was in use; never your arguments, files, keys or
   tokens. It prints the report's event id. `DO_NOT_TRACK=1` or an empty `STARZERO_SENTRY_DSN=`
   in your environment turns it off.
+- Once a day, before a command runs, the CLI asks GitHub's releases page for the newest
+  `starzero` release (one request) and notes the answer in `~/.starzero/update-check.json`. When
+  the pinned version is behind, it prints one `update:` line on stderr; Claude is told to leave
+  that line alone, since a plugin update moves the pin. `DO_NOT_TRACK=1`, or a set `CI`, turns
+  the check off; `--help` and `--version` never check.
 - A Shade API key, if you store one, lives in `~/.starzero/shade-credentials` (or under
   `$STARZERO_CONFIG_DIR`), one line with mode 0600, written by `scripts/shade login --stdin` in
   your own terminal (Git Bash on Windows) and removed by `scripts/shade logout`; on macOS and

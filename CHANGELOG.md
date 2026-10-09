@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.7.3
+
+- CLI pinned at 0.12.1: `media resolve <url>` lists the videos behind a playlist, channel or
+  folder share on the server, without importing or billing, and with `--library` leaves out what
+  the library already holds. ingest-media uses it in place of `yt-dlp`, after the library is
+  picked, with `--json` and in the background; the plugin no longer runs anything on the user's
+  machine to read a list page, and the README says so. A YouTube `watch` link with `list=`
+  resolves to the whole playlist, so the skill still sends the bare video URL when the user means
+  the one video. The CLI also checks once a day for a newer release and prints one `update:` line
+  on stderr until the pin moves; cli-conventions tells Claude to leave the line alone, and the
+  README discloses the request, the cache file and the opt-outs.
+
 ## 0.7.2
 
 - CLI pinned at 0.11.0: `workflow instance get <id> --library --media` resolves a run's library
@@ -80,7 +92,7 @@
 ## 0.6.1
 
 - CLI pinned at 0.9.0: `starzero media import` creates media from video URLs (YouTube, Google
-  Drive, Frame.io, Facebook, most sites yt-dlp reads); the server fetches the videos. The
+  Drive, Frame.io, Facebook and many more); the server fetches the videos. The
   `ingest-media` skill takes URLs next to files: a playlist, channel or folder page is expanded
   into video URLs first (with `yt-dlp` when the machine has it, otherwise by asking), the list and
   its count are shown before anything is sent, and the billing question says the import is
