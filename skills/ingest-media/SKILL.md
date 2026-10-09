@@ -37,7 +37,7 @@ Gets the media the user names (`$ARGUMENTS`: files, a folder to expand into its 
 ## Report back
 
 - Library id and name, folder path.
-- The per-item rows: outcome, media id, status, file or URL.
+- The per-item rows: outcome, media id, status, file or URL. When the user later asks where a media came from, `media get` prints `origin`: `upload`, or the platform and URL it was imported from.
 - Credits: the estimate before, and what the dry run or `starzero credits` said was left.
 - After the watch: which ids are `completed`, which `errored`, with the status column.
 - Warnings the CLI printed, in the CLI's words.

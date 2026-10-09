@@ -115,9 +115,12 @@ starting a second run while one is active.
 - One hook, at session start: `scripts/session-start` puts the plugin's `scripts` folder on the
   PATH of the session's Bash commands, so a bare `starzero` resolves to the launcher (nothing is
   installed until the first command runs), and checks whether `~/.starzero/credentials` (or
-  `$STARZERO_CONFIG_DIR/credentials`) exists or `STARZERO_API_KEY` is set; when neither is, it
-  tells Claude to run `/starzero:setup` before the first StarZero request. It reads nothing else,
-  contacts nothing, and prints nothing once you are logged in. No plugin options. It bundles
+  `$STARZERO_CONFIG_DIR/credentials`) exists or `STARZERO_API_KEY` is set. It prints one line for
+  Claude either way: with a login stored, that the CLI is logged in and is the route to StarZero in
+  this session; without one, to run `/starzero:setup` before the first StarZero request. The line
+  also says the bundled connector is optional, since Claude Code reports it as unauthenticated until
+  you connect it, and Claude would otherwise take StarZero as unavailable. It reads nothing else and
+  contacts nothing. No plugin options. It bundles
   one remote MCP server, the StarZero connector at `https://mcp.starzero.ai/mcp`, described below;
   no local MCP server.
 
@@ -155,7 +158,7 @@ claude --plugin-dir .          # load the working tree for one session
 # Opening this repo in Claude Code also offers `.mcp.json` as a project MCP server; approve or skip it.
 claude plugin validate . --strict
 test/launcher.sh               # downloads the pinned CLI into a temp HOME and runs it
-test/session-start.sh          # the SessionStart hook speaks only without a credential
+test/session-start.sh          # the SessionStart hook says logged in or setup first, and the connector is optional
 test/shade.sh                  # scripts/shade against fake curl and rclone on PATH (needs jq)
 scripts/check-versions.sh
 ```

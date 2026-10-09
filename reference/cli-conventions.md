@@ -23,7 +23,7 @@ In human mode the same facts appear as the table, then `warning: ...` lines, the
 { "ok": true, "data": <result>, "warnings": ["..."], "next": { "<label>": "starzero ..." } }
 ```
 
-- `warnings` lists things that happened but did not stop the command. Read it: `instance create` reports "variables were not validated" there, and the run has started anyway.
+- `warnings` lists things that happened but did not stop the command. In human output, warnings and hints follow the result after two blank lines. Read it: `instance create` reports "variables were not validated" there, and the run has started anyway.
 - `next` holds the exact follow-up commands (`watch`, `shareRun`, `url`, `share`). Run those verbatim instead of composing your own.
 
 Error, on stderr:

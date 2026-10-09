@@ -2,16 +2,22 @@
 # SessionStart hook. Two things, both read-only on the machine:
 # - puts this folder on PATH for the session's Bash commands (through the env file Claude Code hands
 #   the hook), so a bare `starzero` resolves to the launcher next to this script;
-# - prints one line for Claude when no StarZero credential is in place, so the first StarZero request
-#   starts with the setup skill instead of a failing command. Reads whether the credentials file
-#   exists and whether STARZERO_API_KEY is set; nothing else, no network.
+# - prints one line for Claude saying how StarZero is reached in this session: the starzero CLI in
+#   the shell, with a login stored on this machine or not yet. The line also says that the plugin's
+#   StarZero MCP connector is a separate, optional route, because Claude Code reports that connector
+#   as unauthenticated and Claude would otherwise take StarZero as unavailable and skip the CLI.
+#   Reads whether the credentials file exists and whether STARZERO_API_KEY is set; nothing else, no
+#   network.
 set -eu
 
 here=$(cd "$(dirname "$0")" && pwd)
 # shellcheck disable=SC2016 # the $PATH is expanded later, when Claude Code sources the env file
 [ -n "${CLAUDE_ENV_FILE:-}" ] && printf 'export PATH="%s:$PATH"\n' "$here" >> "$CLAUDE_ENV_FILE"
 
-[ -n "${STARZERO_API_KEY:-}" ] && exit 0
-[ -s "${STARZERO_CONFIG_DIR:-$HOME/.starzero}/credentials" ] && exit 0
+connector="The plugin's StarZero MCP connector is a separate, optional route with its own sign-in; it being unauthenticated does not affect the CLI or the skills."
 
-echo "StarZero plugin: no login is stored on this machine yet. Before the first StarZero request, run the setup skill (/starzero:setup): it installs the starzero CLI and logs the user in through the browser, or with an API key where there is no browser."
+if [ -n "${STARZERO_API_KEY:-}" ] || [ -s "${STARZERO_CONFIG_DIR:-$HOME/.starzero}/credentials" ]; then
+  echo "StarZero plugin: a StarZero login is stored on this machine. The starzero CLI is logged in and is the way to interact with StarZero in this session; the starzero skills run it in the shell. $connector"
+else
+  echo "StarZero plugin: no StarZero login is stored on this machine yet, so the starzero CLI cannot be used until one is. Before the first StarZero request, run the setup skill (/starzero:setup): it installs the starzero CLI and logs the user in through the browser, or with an API key where there is no browser. $connector"
+fi
