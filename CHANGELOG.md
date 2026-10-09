@@ -92,7 +92,7 @@
 ## 0.6.1
 
 - CLI pinned at 0.9.0: `starzero media import` creates media from video URLs (YouTube, Google
-  Drive, Frame.io, Facebook, most sites yt-dlp reads); the server fetches the videos. The
+  Drive, Frame.io, Facebook and many more); the server fetches the videos. The
   `ingest-media` skill takes URLs next to files: a playlist, channel or folder page is expanded
   into video URLs first (with `yt-dlp` when the machine has it, otherwise by asking), the list and
   its count are shown before anything is sent, and the billing question says the import is
