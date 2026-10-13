@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.7.4
+
+- CLI pinned at 0.12.2: `search transcript` and `search visual` work again (the API had stopped
+  accepting a field the CLI always sent, so find-moments failed on every search), and
+  `artifact url`, `chat send --artifact` and `artifact list --type` accept `motion-graphics`
+  keys, which renders.md now lists among the artifact types.
+
 ## 0.7.3
 
 - CLI pinned at 0.12.1: `media resolve <url>` lists the videos behind a playlist, channel or
