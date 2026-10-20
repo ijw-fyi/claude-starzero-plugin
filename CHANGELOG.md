@@ -5,8 +5,7 @@
 - chat: the agent separates a clip's audio into a vocals track and a background track, each with its
   own volume, and on request enhances the vocals by removing echo, room sound and leftover noise,
   billed on top. The skill said "noise reduction" was impossible; it now says EQ and other noise
-  reduction are, and the vocal enhancement is not. "Remove the echo from the voice" and "separate
-  the voice from the music" route to the chat skill.
+  reduction are, and the vocal enhancement is not.
 
 ## 0.7.4
 
