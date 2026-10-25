@@ -12,7 +12,7 @@
 | session (a workflow branch) | chat-shaped string | instance views (`sessions`, `outputs[].sessionId`) | only the chat link the CLI prints; `chat send` to a branch session is not supported |
 | chat | 1 to 64 URL-safe characters | `chat create`, `chat list` | `chat get/send/renders`, `artifact list --chat` |
 | render | 24-hex | instance views (`outputs[].renderId`), `chat renders` | `output url`, `output share` |
-| artifact | `<type>/<id>` | `artifact list`, `chat send` output lines | `artifact url`, `chat send --artifact` (same chat only) |
+| artifact | `<type>/<id>` | `artifact list`, `artifact upload`, `chat send` output lines | `artifact url`, `chat send --artifact` (any chat) |
 
 Rules:
 

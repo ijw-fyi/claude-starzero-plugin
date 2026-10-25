@@ -56,7 +56,7 @@ Every other command in this skill is free, with the search caveat above.
 | no hits | media not `completed`, or the query is off | `starzero media get --library <id> <mediaId>` to check status; `/starzero:ingest-media` watches processing; then widen the query or lower `--threshold` |
 | exit 2 on `search` | empty `--query`, or `visual` got both or neither of `--query` / `--image` | fix the flags; `--help` lists them |
 | exit 2 on any id | the id is not 24-hex | take it from `media list` or a search hit |
-| exit 8 `FILE_EXISTS` on `download` / `thumbnail` | the local file exists | choose another `--out`, or ask before `--force` |
+| exit 8 `FILE_EXISTS` on `download` / `thumbnail` | the local file exists; nothing was fetched | choose another `--out`, or ask before `--force` |
 | `--which audio-vocals` or `audio-background` fails | speech separation has not been run on this media | use `--which audio` or `original` |
 | exit 1 with an API code such as `NO_ACCESS_TO_LIBRARY` | the key cannot see that library; this is an API refusal, not exit 3 | pick a library from `library list` |
 | exit 6 on `output render` | the wait ended early and the render was cancelled | re-run in the background; a clean render needs a fresh yes |
