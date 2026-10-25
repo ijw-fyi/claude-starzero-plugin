@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.7.7
+
+- The chat skill describes the StarZero agent as the producer it is: it plans a multi-step job,
+  hands research to specialist helpers in parallel, keeps the project across turns, lints every
+  change for cut-off words, flash frames, overlapping speech and overlay collisions, and looks at
+  its own render. The new "What the agent is" section says what a shell lacks (word timings,
+  speaker detection, lint, a view of the output) and that the brief carries the goal rather than
+  pre-chewed steps or clip picks. Brand kits saved in the app, applied by name in a chat, join the
+  capability list. The description is shorter, carries the same framing, and its examples read as
+  briefs rather than single edits; the README's chat row agrees.
+
 ## 0.7.6
 
 - CLI pinned at 0.14.0 (from 0.12.2). `artifact upload <path...>` puts files on the account as
