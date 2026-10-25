@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.7.8
+
+- The chat skill's description says that none of what the agent does is possible from a shell,
+  so the contrast is in front of the trigger decision as well as in the body.
+
 ## 0.7.7
 
 - The chat skill describes the StarZero agent as the producer it is: it plans a multi-step job,

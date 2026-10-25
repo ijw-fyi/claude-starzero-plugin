@@ -1,6 +1,6 @@
 ---
 name: chat
-description: 'Hands video work to the StarZero agent, a producer that plans the job, researches the whole library, cuts from word timings, reframes by following the speaker, generates clips, graphics, voiceover and music, lints and watches its own render, and keeps the project across turns. An edit of a video in a StarZero library happens here, not with local tools; a local recording goes through ingest-media first. Use when the user says "make it 9:16 with captions", "cut these interviews into a two-minute recap with an intro and music", "find every pricing claim in the library and make a comparison video", "add a lower-third with her name", "apply my Podcast kit and render" or "continue my chat".'
+description: 'Hands video work to the StarZero agent, a producer that plans the job, researches the whole library, cuts from word timings, reframes by following the speaker, generates clips, graphics, voiceover and music, lints and watches its own render, and keeps the project across turns, none of which a shell can do. An edit of a video in a StarZero library happens here, not with local tools; a local recording goes through ingest-media first. Use when the user says "make it 9:16 with captions", "cut these interviews into a two-minute recap with an intro and music", "find every pricing claim in the library and make a comparison video", "add a lower-third with her name", "apply my Podcast kit and render" or "continue my chat".'
 argument-hint: "[chat id or question]"
 ---
 
