@@ -8,8 +8,8 @@
   its own render. The new "What the agent is" section says what a shell lacks (word timings,
   speaker detection, lint, a view of the output) and that the brief carries the goal rather than
   pre-chewed steps or clip picks. Brand kits saved in the app, applied by name in a chat, join the
-  capability list. The description and the README's chat row carry the same framing; the trigger
-  phrases are unchanged.
+  capability list. The description is shorter, carries the same framing, and its examples read as
+  briefs rather than single edits; the README's chat row agrees.
 
 ## 0.7.6
 
