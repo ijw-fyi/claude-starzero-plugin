@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.7.9
+
+- Version bump only. 0.7.8 was tagged twice with different descriptions in the chat skill; this
+  release carries the wording of the second tag so an installed 0.7.8 moves to one known state.
+
 ## 0.7.8
 
 - The chat skill's description says that Claude cannot do any of what the agent does from its shell,
