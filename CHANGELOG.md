@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.7.6
+
+- CLI pinned at 0.14.0 (from 0.12.2). `artifact upload <path...>` puts files on the account as
+  artifacts without a message or credits, and `chat send --artifact` attaches any key the account
+  can see (another chat's, an upload's, a shared one), which the chat skill, graphics.md and
+  ids-and-links.md now say; the exit 4 row no longer claims the key must belong to the chat. A
+  `chat send` whose request never gets an answer exits 6, which waiting.md names next to the
+  silence case. A watch that gives up says why in its message, and `media download` and
+  `media thumbnail` refuse an existing file before fetching anything.
+
 ## 0.7.5
 
 - chat: the agent separates a clip's audio into a vocals track and a background track, each with its

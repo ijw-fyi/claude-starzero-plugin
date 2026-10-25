@@ -67,7 +67,7 @@ Gets the media the user names (`$ARGUMENTS`: files, a folder to expand into its 
 | `cooldown` events on stderr | a part hit a 500 or 503 and waits 30 s | the upload is working; wait |
 | exit 6 on `media watch` | still processing | run the resume command from the hint |
 | exit 7 `MEDIA_FAILED` / exit 1 on watch | some or all media `errored` | report which, from the status column; a retry happens in the StarZero app |
-| exit 1 `POLL_FAILED` | repeated fetch failures in a row | run the same watch again once the API answers |
+| exit 1 `POLL_FAILED` | repeated fetch failures in a row; the message says why | run the same watch again once the API answers |
 
 ## Reference files
 

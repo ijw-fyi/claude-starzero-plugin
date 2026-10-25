@@ -28,4 +28,4 @@ Per element: which file, clip or overlay, start (a time, or a cue such as "when 
 
 ## After
 
-The agent's render is the review point: watch the watermarked result (`chat renders`, then `/starzero:share-render`), and fix a graphic by editing its file and sending it again on the same chat, attached with `--file` (a new artifact) and a message that names what changed; `--artifact <type>/<id>` re-attaches an unchanged one.
+The agent's render is the review point: watch the watermarked result (`chat renders`, then `/starzero:share-render`), and fix a graphic by editing its file and sending it again on the same chat, attached with `--file` (a new artifact) and a message that names what changed; a graphic several chats will use is uploaded once with `artifact upload` and attached by key with `--artifact`; `--artifact <type>/<id>` re-attaches an unchanged one.
