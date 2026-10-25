@@ -2,7 +2,7 @@
 
 ## 0.7.8
 
-- The chat skill's description says that none of what the agent does is possible from a shell,
+- The chat skill's description says that Claude cannot do any of what the agent does from its shell,
   so the contrast is in front of the trigger decision as well as in the body.
 
 ## 0.7.7
