@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.7.10
+
+- The chat skill follows the agent's new limits: a colour grade, a rotation, a speed ramp, a blur
+  over a fixed region and EQ on the footage's sound are now treatments the agent's designer builds
+  as a clip from the footage (captions skip such a clip), a dissolve or wipe is a designed overlay
+  across the cut, and a speed change keeps pitch. The cannot-do line is down to reverse playback,
+  pitch shift, stabilisation, denoising, tracking, loudness measurement and encoder settings.
+
 ## 0.7.9
 
 - Version bump only. 0.7.8 was tagged twice with different descriptions in the chat skill; this
