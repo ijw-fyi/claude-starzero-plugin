@@ -4,7 +4,7 @@ The CLI documents itself. Discover commands with `--help` instead of guessing fl
 
 ## Finding the right command
 
-- `starzero --help` lists the command groups: `auth`, `credits`, `library`, `folder`, `media`, `search`, `workflow`, `podcast-clips`, `output`, `chat`, `artifact`. `credits` is a single command.
+- `starzero --help` lists the command groups: `auth`, `credits`, `library`, `folder`, `media`, `search`, `workflow`, `podcast-clips`, `output`, `chat`, `artifact`, `skill`. `credits` is a single command.
 - `starzero <group> --help` lists the commands in a group, for example `starzero media --help`. `workflow` has two sub-groups, `template` and `instance`.
 - `starzero <group> <command> --help` shows the flags, their defaults and value ranges, for example `starzero media upload --help`. Read it before the first use of a command in a session; the help is the source of truth for flags, and it matches the installed version even when this plugin is older.
 - `--help` and `--version` need no API key and cost nothing.
@@ -42,17 +42,17 @@ An `INTERNAL` error adds `"reported": true` and `"eventId": "..."` when the CLI 
 | Code | Meaning | What to do |
 | --- | --- | --- |
 | 0 | success | continue |
-| 1 | runtime or API error | read stderr; a cancelled run also ends here. `INTERNAL` is a bug in the CLI, reported by the CLI itself: relay the message and the event id; a re-run rarely helps |
+| 1 | runtime or API error | read stderr; a cancelled run also ends here. `INTERNAL` is a bug in the CLI, reported by the CLI itself: relay the message and the event id; a re-run rarely helps. `FILE_ERROR` means the disk refused a read or write of the path it names. `CREDENTIALS_LOCKED` means another process held the login; run the command again |
 | 2 | usage error | fix the flags; `--help` shows the accepted values |
-| 3 | login expired (browser tokens last 5 days), no credential, bad credential, or missing scope | log in again (`auth.md`), then re-run |
+| 3 | browser login revoked or from a CLI before 0.16.0, no credential, bad credential, or missing scope | log in again (`auth.md`), then re-run |
 | 4 | not found | check the id came from a list or view |
 | 5 | refused before sending anything (credits, storage, invalid variables) | report the numbers; nothing was billed; `starzero credits` shows the balance |
 | 6 | the wait ended early: a watch gave up, or a request went unanswered | run the resume command from the hint; for `output render` the disconnect cancelled the render |
 | 7 | partial success; details on stdout | inspect the status column or sessions table; retrying is a separate decision |
-| 8 | conflict (local file exists, server conflict) | choose another `--out`, or ask before `--force` |
+| 8 | conflict (local file exists, skill name taken, server conflict) | choose another `--out`, or ask before `--force`; for `skill push`, ask before `--replace` |
 | 130 | interrupted | the run continues; the hint prints resume and cancel commands |
 
-Read the exit code first. On 1, 6 and 7 the CLI can print a complete `{"ok": true, ...}` view on stdout (the partial result) while stderr carries the `{"ok": false, ...}` error. A parser that trusts `ok` on stdout alone misreports failures.
+Read the exit code first. On 1, 6 and 7 the CLI can print a complete `{"ok": true, ...}` view on stdout (the partial result) while stderr carries the `{"ok": false, ...}` error. A parser that trusts `ok` on stdout alone misreports failures. A reader that closes the pipe early (`| head`, a pager) ends a succeeding command with exit 0 and cuts its output, so a command whose result matters runs unpiped.
 
 Usage errors come in two forms: a rejected flag prints a plain `error: ...` line with no JSON, while an invalid value inside a handler (an id of the wrong shape, an empty `--query`) prints the JSON error envelope.
 
@@ -61,12 +61,13 @@ Usage errors come in two forms: a rejected flag prints a plain `error: ...` line
 - `chat send` streams the reply as text and ends with a `[done in m:ss · N tool calls · C credits · N tokens in context]` footer (the JSON summary line carries the same as `context`); with `--json` it becomes one NDJSON event per tool call plus a summary line, which is more tokens for the same information. Stay in human mode unless piping.
 - `media upload --events` and `media watch --events` write NDJSON progress to stderr; `workflow instance watch --progress` writes plain lines to stderr. Stdout stays one document.
 - A line `update: starzero X.Y.Z is available ...` on stderr, before a command's output, means a newer CLI release exists than the one the plugin pins. The plugin moves its pin with its own updates: leave the line alone, run no upgrade, and read the output as usual.
+- A line `warning: the login could not be renewed (...)` on stderr, printed even with `--json`, means the command ran on the token it has and the next command tries again.
 
 ## Shapes worth knowing
 
-- Lists: `data` is `{ "items": [...], "total": n, "offset": n, "limit": n, "next": <offset or null> }`. `artifact list` uses a cursor: `{ "items": [...], "next": "<createdAt>:<id>" }`.
+- Lists: `data` is `{ "items": [...], "total": n, "offset": n, "limit": n, "next": <offset or null> }`. `artifact list` uses a cursor: `{ "items": [...], "next": "<createdAt>:<id>" }`. `skill list` puts a bare array in `data`.
 - Every 24-character hex id is validated locally before any request; a wrong shape is exit 2.
-- `--force` means overwrite a local file on `media download` and `media thumbnail`, and skip variable validation on `workflow instance create`. Decide it per command.
+- `--force` means overwrite a local file on `media download` and `media thumbnail`, and skip variable validation on `workflow instance create`. Decide it per command. `skill pull` takes no `--force`: it overwrites that skill's own files and touches nothing else in the folder.
 - `--library` is required wherever it appears; there is no default library. List libraries or ask before choosing.
 - The CLI has no delete commands. Deleting a library, media item, chat or run happens in the StarZero app; say so when asked.
 - Human tables put the id in the first column, print sizes in MB, durations as `m:ss`, timestamps as ISO-8601.

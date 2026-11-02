@@ -32,23 +32,23 @@ one_line "empty HOME" "$out"
 
 mkdir -p "$home/.starzero" && printf '{}\n' > "$home/.starzero/credentials"
 out=$(HOME="$home" STARZERO_API_KEY='' "$hook")
-expect "credentials file present" "is logged in" "$out"
+expect "credentials file present" "log in again when it exits 3" "$out"
 expect "credentials file present" "connector" "$out"
 lacks "credentials file present" "/starzero:setup" "$out"
 one_line "credentials file present" "$out"
 
 out=$(HOME="$home/none" STARZERO_API_KEY=key "$hook")
-expect "STARZERO_API_KEY set" "is logged in" "$out"
+expect "STARZERO_API_KEY set" "log in again when it exits 3" "$out"
 lacks "STARZERO_API_KEY set" "/starzero:setup" "$out"
 
 mkdir -p "$home/cfg" && printf '{}\n' > "$home/cfg/credentials"
 out=$(HOME="$home/none" STARZERO_API_KEY='' STARZERO_CONFIG_DIR="$home/cfg" "$hook")
-expect "STARZERO_CONFIG_DIR credentials" "is logged in" "$out"
+expect "STARZERO_CONFIG_DIR credentials" "log in again when it exits 3" "$out"
 lacks "STARZERO_CONFIG_DIR credentials" "/starzero:setup" "$out"
 
 env_file="$home/env"
 out=$(HOME="$home/none" STARZERO_API_KEY=key CLAUDE_ENV_FILE="$env_file" "$hook")
-expect "with CLAUDE_ENV_FILE" "is logged in" "$out"
+expect "with CLAUDE_ENV_FILE" "log in again when it exits 3" "$out"
 grep -q "^export PATH=\"$root/scripts:\$PATH\"$" "$env_file" || { printf 'FAIL env file lacks the PATH line:\n'; cat "$env_file"; exit 1; }
 
-printf 'ok   session-start says logged in or setup first, names the connector as optional, and puts scripts/ on PATH\n'
+printf 'ok   session-start says a login is stored or setup first, names the connector as optional, and puts scripts/ on PATH\n'

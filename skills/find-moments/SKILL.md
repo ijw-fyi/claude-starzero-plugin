@@ -11,7 +11,7 @@ Searches a library for `$ARGUMENTS` in the spoken words or on screen and returns
 ## Prerequisites
 
 - This skill runs the `starzero` CLI in the shell. Every `starzero ...` below is run as `${CLAUDE_PLUGIN_ROOT}/scripts/starzero ...`: that launcher installs the pinned CLI on first use and hands over to it. Without a shell (claude.ai chat), the plugin's StarZero connector offers the same API as tools and carries its own instructions; the commands in this skill apply where a shell exists.
-- Exit 3 from any command means the login has expired (browser logins last 5 days), or the credential is missing, invalid or lacks a scope. Log in again by the procedure in `${CLAUDE_PLUGIN_ROOT}/reference/auth.md` ("Logging in from a skill"), then re-run the command; when that fails, the user runs `/starzero:setup`.
+- Exit 3 from any command means the browser login was revoked or comes from a CLI before 0.16.0, or the credential is missing, invalid or lacks a scope. Log in again by the procedure in `${CLAUDE_PLUGIN_ROOT}/reference/auth.md` ("Logging in from a skill"), then re-run the command; when that fails, the user runs `/starzero:setup`.
 
 ## Steps
 
@@ -57,6 +57,7 @@ Every other command in this skill is free, with the search caveat above.
 | exit 2 on `search` | empty `--query`, or `visual` got both or neither of `--query` / `--image` | fix the flags; `--help` lists them |
 | exit 2 on any id | the id is not 24-hex | take it from `media list` or a search hit |
 | exit 8 `FILE_EXISTS` on `download` / `thumbnail` | the local file exists; nothing was fetched | choose another `--out`, or ask before `--force` |
+| exit 1 `FILE_ERROR` on `download` / `thumbnail` | the destination cannot be written: a missing folder, a file where a folder is expected, no permission | fix the path the message names, or choose another `--out` |
 | `--which audio-vocals` or `audio-background` fails | speech separation has not been run on this media | use `--which audio` or `original` |
 | exit 1 with an API code such as `NO_ACCESS_TO_LIBRARY` | the key cannot see that library; this is an API refusal, not exit 3 | pick a library from `library list` |
 | exit 6 on `output render` | the wait ended early and the render was cancelled | re-run in the background; a clean render needs a fresh yes |

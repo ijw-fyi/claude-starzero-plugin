@@ -14,7 +14,7 @@ One provider today: **Shade** (shade.inc), through `${CLAUDE_PLUGIN_ROOT}/script
 
 - This skill runs the `starzero` CLI in the shell. Every `starzero ...` below is run as `${CLAUDE_PLUGIN_ROOT}/scripts/starzero ...`: that launcher installs the pinned CLI on first use and hands over to it. Without a shell (claude.ai chat), the plugin's StarZero connector offers the same API as tools and carries its own instructions; the commands in this skill apply where a shell exists. The Shade half needs the shell too: on claude.ai chat, the user's Shade connector covers browsing and download links, and uploads into Shade wait for a session with a shell.
 - `shade ...` below is `${CLAUDE_PLUGIN_ROOT}/scripts/shade ...`; in this shell the bare name also resolves, through the PATH entry the plugin's hook adds. The user's own terminal has no such entry, so a command meant for them carries the absolute path (`echo "${CLAUDE_PLUGIN_ROOT}/scripts/shade"` prints it). The script drives rclone and jq, which the user installs; the plugin downloads nothing for this. Its exit codes follow the CLI table in `cli-conventions.md`: 2 usage, 3 key missing or refused, 4 not found, 8 destination exists, 1 anything else.
-- Exit 3 has two owners here, and each message says which tool it came from. From `starzero`: the StarZero login expired or is missing; log in again by `${CLAUDE_PLUGIN_ROOT}/reference/auth.md` ("Logging in from a skill"). From `shade`: the Shade key is missing or refused; follow "The key" in `shade.md`.
+- Exit 3 has two owners here, and each message says which tool it came from. From `starzero`: the StarZero login is missing, revoked or from a CLI before 0.16.0; log in again by `${CLAUDE_PLUGIN_ROOT}/reference/auth.md` ("Logging in from a skill"). From `shade`: the Shade key is missing or refused; follow "The key" in `shade.md`.
 - Shell variables such as `$dir` below live only inside one Bash call: chain the commands of a step in one call, or substitute the printed path in the next call.
 
 ## Steps
@@ -54,7 +54,7 @@ Uploads into the provider and downloads from it proceed on the user's request; t
 | "size mismatch after upload" | the drive reports a different size than the local file | run the same `upload --force` once more; when it repeats, the user checks the file in the Shade app |
 | `curl` on the StarZero URL fails with 403 | the signed URL expired (1 day by default, `renders.md`) | `starzero output url` again and retry the download |
 | `media import` row `failed` on a Shade URL | the server could not fetch it (expired URL, or a URL form it does not take) | the fallback: `shade download`, then the upload path, for that file |
-| `starzero` exit 3 | the StarZero login expired or is missing | log in again (`auth.md`), then re-run |
+| `starzero` exit 3 | the StarZero login is missing, revoked or from a CLI before 0.16.0 | log in again (`auth.md`), then re-run |
 
 ## Reference files
 

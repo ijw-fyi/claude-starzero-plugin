@@ -34,9 +34,10 @@ for a StarZero job straight away works too.
 
 Setup downloads the CLI on first use, installs `ffprobe` next to it on Linux and Windows, then logs
 you in: a browser tab opens on the StarZero login page, and the CLI stores the resulting token in
-`~/.starzero/credentials`, owner-only. Nothing is pasted into the chat. A browser login lasts 5 days; any skill
-logs you in again when it has expired. On a machine without a browser, setup gives you a URL to
-open on any device and asks for the address the login ends on. An API key from
+`~/.starzero/credentials`, owner-only. Nothing is pasted into the chat. A browser login renews itself; any
+skill logs you in again if it ever ends, and a login from a plugin before 0.8.0 asks for that once.
+On a machine without a browser, setup gives you a URL to open on any device and asks for the
+address the login ends on. An API key from
 https://app.starzero.ai/settings/api-keys works too (`starzero auth login --api-key`), for example
 in a cloud session where `STARZERO_API_KEY` is set as an environment variable.
 
@@ -53,6 +54,7 @@ estimate before uploads and checks a graphic rendered as MP4 before it is handed
 | `starzero:podcast-clips` | "cut this episode into five vertical clips with captions" |
 | `starzero:chat` | "trim this interview to 60 seconds, 9:16, with captions", "add a lower-third with her name", "remove the echo from his voice", "ask the StarZero agent to make a two-minute recap of this library", "find every product mention across all interviews", "make an animated intro with a voiceover and music for this episode" (an edit of library video goes through the agent, a producer that plans the job, works across the whole library in one chat, generates video, voiceover, music and images, and checks its own cut before rendering; Claude makes the designed graphics itself and hands them over for placement) |
 | `starzero:share-render` | "share the run", "give me a link to the video", "download the output" |
+| `starzero:starzero-skills` | "save this as a StarZero skill", "show my StarZero skills", "pull my cold-open skill" (skills for the StarZero agent, separate from Claude's own) |
 | `starzero:storage-providers` | "upload this render to our Shade drive", "list my Shade drives", "pull this clip from Shade into StarZero" (Shade is the first provider; you install rclone and jq, the plugin downloads nothing for it) |
 | `starzero:setup` | install, log in, check scopes (you run this one yourself) |
 
@@ -111,7 +113,9 @@ starting a second run while one is active.
   reads or writes no `rclone.conf`.
 - Your StarZero credential lives in `~/.starzero/credentials` (or under `$STARZERO_CONFIG_DIR`), one line
   with mode 0600, on every platform; on macOS and Linux the CLI refuses the file when other users
-  can read it. `starzero auth logout` removes it and revokes a browser login token. CLI versions
+  can read it. `starzero auth logout` removes it and ends a browser login on the server, a chat turn running on
+  it included. A browser login belongs to one machine: log in on each, or share access with an API
+  key. CLI versions
   before 0.8.0 used the OS keychain, and the CLI leaves that item alone: to remove it, delete the
   `starzero-cli` item in Keychain Access (macOS) or the generic credential whose name contains
   `starzero-cli` in Credential Manager (Windows). The connector's sign-in token is separate and
@@ -121,8 +125,9 @@ starting a second run while one is active.
   PATH of the session's Bash commands, so a bare `starzero` resolves to the launcher (nothing is
   installed until the first command runs), and checks whether `~/.starzero/credentials` (or
   `$STARZERO_CONFIG_DIR/credentials`) exists or `STARZERO_API_KEY` is set. It prints one line for
-  Claude either way: with a login stored, that the CLI is logged in and is the route to StarZero in
-  this session; without one, to run `/starzero:setup` before the first StarZero request. The line
+  Claude either way: with a login stored, that the CLI is the route to StarZero in
+  this session and that an exit 3 means logging in again; without one, to run `/starzero:setup`
+  before the first StarZero request. The line
   also says the bundled connector is optional, since Claude Code reports it as unauthenticated until
   you connect it, and Claude would otherwise take StarZero as unavailable. It reads nothing else and
   contacts nothing. No plugin options. It bundles
@@ -163,7 +168,7 @@ claude --plugin-dir .          # load the working tree for one session
 # Opening this repo in Claude Code also offers `.mcp.json` as a project MCP server; approve or skip it.
 claude plugin validate . --strict
 test/launcher.sh               # downloads the pinned CLI into a temp HOME and runs it
-test/session-start.sh          # the SessionStart hook says logged in or setup first, and the connector is optional
+test/session-start.sh          # the SessionStart hook says a login is stored or setup first, and the connector is optional
 test/shade.sh                  # scripts/shade against fake curl and rclone on PATH (needs jq)
 scripts/check-versions.sh
 ```
