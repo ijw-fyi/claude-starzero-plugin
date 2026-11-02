@@ -114,7 +114,8 @@ starting a second run while one is active.
 - Your StarZero credential lives in `~/.starzero/credentials` (or under `$STARZERO_CONFIG_DIR`), one line
   with mode 0600, on every platform; on macOS and Linux the CLI refuses the file when other users
   can read it. `starzero auth logout` removes it and ends a browser login on the server, a chat turn running on
-  it included. A browser login belongs to one machine: log in on each, or share access with an API
+  it included. A warning that the revocation failed means the login stays valid on the server, and a login from before 0.16.0 is removed from this machine only.
+  A browser login belongs to one machine: log in on each, or share access with an API
   key. CLI versions
   before 0.8.0 used the OS keychain, and the CLI leaves that item alone: to remove it, delete the
   `starzero-cli` item in Keychain Access (macOS) or the generic credential whose name contains

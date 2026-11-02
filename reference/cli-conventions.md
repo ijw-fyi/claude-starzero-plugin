@@ -69,7 +69,7 @@ Usage errors come in two forms: a rejected flag prints a plain `error: ...` line
 - Every 24-character hex id is validated locally before any request; a wrong shape is exit 2.
 - `--force` means overwrite a local file on `media download` and `media thumbnail`, and skip variable validation on `workflow instance create`. Decide it per command. `skill pull` takes no `--force`: it overwrites that skill's own files and touches nothing else in the folder.
 - `--library` is required wherever it appears; there is no default library. List libraries or ask before choosing.
-- The CLI has no delete commands. Deleting a library, media item, chat or run happens in the StarZero app; say so when asked.
+- The CLI has no delete commands. Deleting a library, media item, chat, run or skill happens in the StarZero app; say so when asked.
 - Human tables put the id in the first column, print sizes in MB, durations as `m:ss`, timestamps as ISO-8601.
 
 ## Key hygiene
