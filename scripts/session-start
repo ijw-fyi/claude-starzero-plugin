@@ -17,7 +17,7 @@ here=$(cd "$(dirname "$0")" && pwd)
 connector="The plugin's StarZero MCP connector is a separate, optional route with its own sign-in; it being unauthenticated does not affect the CLI or the skills."
 
 if [ -n "${STARZERO_API_KEY:-}" ] || [ -s "${STARZERO_CONFIG_DIR:-$HOME/.starzero}/credentials" ]; then
-  echo "StarZero plugin: a StarZero login is stored on this machine. The starzero CLI is logged in and is the way to interact with StarZero in this session; the starzero skills run it in the shell. $connector"
+  echo "StarZero plugin: a StarZero login is stored on this machine. The starzero CLI is the way to interact with StarZero in this session; the starzero skills run it in the shell and log in again when it exits 3. $connector"
 else
   echo "StarZero plugin: no StarZero login is stored on this machine yet, so the starzero CLI cannot be used until one is. Before the first StarZero request, run the setup skill (/starzero:setup): it installs the starzero CLI and logs the user in through the browser, or with an API key where there is no browser. $connector"
 fi

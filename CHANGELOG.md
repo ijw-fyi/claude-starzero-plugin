@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.8.0
+
+- The plugin pins CLI 0.16.0, and a browser login now renews itself, so a long chat turn no longer
+  dies on an expired login and the routine log-in every 5 days is gone. A browser login made
+  before this version reads as not logged in: the first command asks for one more login, and any
+  skill can run it. A stored API key keeps working.
+- `starzero auth logout` now ends the whole login on the server, a chat turn running on it
+  included, and a login belongs to one machine: a copy of the credentials file used elsewhere gets
+  it revoked on both. `reference/auth.md`, the setup skill and the exit 3 lines of every skill
+  follow.
+- New skill, `starzero-skills`: lists and reads the skills on a StarZero account, drafts a new one,
+  shows every file before a push, pulls one to disk and marks one important. These are skills for
+  the StarZero agent, separate from Claude's own. The chat skill says that a `/name` in a message
+  loads one.
+- The session-start line says a login is stored, and leaves out that the CLI is logged in, which it
+  cannot know from the file alone.
+- The exit code notes cover `FILE_ERROR`, `CREDENTIALS_LOCKED`, the renewal warning and a pipe closed
+  early, which ends a succeeding command with exit 0.
+
 ## 0.7.10
 
 - The chat skill follows the agent's new limits: a colour grade, a rotation, a speed ramp, a blur

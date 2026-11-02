@@ -11,7 +11,7 @@ Starts one podcast-clips run on a single processed media item, waits for it, and
 ## Prerequisites
 
 - This skill runs the `starzero` CLI in the shell. Every `starzero ...` below is run as `${CLAUDE_PLUGIN_ROOT}/scripts/starzero ...`: that launcher installs the pinned CLI on first use and hands over to it. Without a shell (claude.ai chat), the plugin's StarZero connector offers the same API as tools and carries its own instructions; the commands in this skill apply where a shell exists.
-- Exit 3 from any command means the login has expired (browser logins last 5 days), or the credential is missing, invalid or lacks a scope. Log in again by the procedure in `${CLAUDE_PLUGIN_ROOT}/reference/auth.md` ("Logging in from a skill"), then re-run the command; when that fails, the user runs `/starzero:setup`.
+- Exit 3 from any command means the browser login was revoked or comes from a CLI before 0.16.0, or the credential is missing, invalid or lacks a scope. Log in again by the procedure in `${CLAUDE_PLUGIN_ROOT}/reference/auth.md` ("Logging in from a skill"), then re-run the command; when that fails, the user runs `/starzero:setup`.
 
 ## Steps
 
@@ -52,7 +52,7 @@ From the `get` view: status, `creditsUsed`, the app link as printed, the session
 | 6 on watch | the wait ended early; the run continues server-side | run the resume command from the hint |
 | 130 | interrupted; the run continues | print the resume and cancel commands the CLI gave and let the user choose |
 | 4 on `media get` or `instance get` | the id is not in this library or not a known instance | take the id from `media list` or `podcast-clips list` |
-| 3 | login expired (5 days), or credential missing, invalid or lacking a scope | log in again (`auth.md`), then re-run |
+| 3 | browser login revoked or from a CLI before 0.16.0, or credential missing, invalid or lacking a scope | log in again (`auth.md`), then re-run |
 
 ## Reference files
 

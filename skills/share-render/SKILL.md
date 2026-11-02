@@ -11,7 +11,7 @@ Hands StarZero output over as a link. A workflow or podcast run is shared whole:
 ## Prerequisites
 
 - This skill runs the `starzero` CLI in the shell. Every `starzero ...` below is run as `${CLAUDE_PLUGIN_ROOT}/scripts/starzero ...`: that launcher installs the pinned CLI on first use and hands over to it. Without a shell (claude.ai chat), the plugin's StarZero connector offers the same API as tools and carries its own instructions; the commands in this skill apply where a shell exists.
-- Exit 3 from any command means the login has expired (browser logins last 5 days), or the credential is missing, invalid or lacks a scope. Log in again by the procedure in `${CLAUDE_PLUGIN_ROOT}/reference/auth.md` ("Logging in from a skill"), then re-run the command; when that fails, the user runs `/starzero:setup`.
+- Exit 3 from any command means the browser login was revoked or comes from a CLI before 0.16.0, or the credential is missing, invalid or lacks a scope. Log in again by the procedure in `${CLAUDE_PLUGIN_ROOT}/reference/auth.md` ("Logging in from a skill"), then re-run the command; when that fails, the user runs `/starzero:setup`.
 
 ## Steps
 
@@ -47,7 +47,7 @@ Hands StarZero output over as a link. A workflow or podcast run is shared whole:
 
 | Symptom | Meaning | What to do |
 | --- | --- | --- |
-| exit 3 | login expired (5 days), or credential missing, invalid or lacking a scope | log in again (`auth.md`), then re-run |
+| exit 3 | browser login revoked or from a CLI before 0.16.0, or credential missing, invalid or lacking a scope | log in again (`auth.md`), then re-run |
 | exit 2, `--expires` rejected | the value is above 604800 seconds | lower it; 7 days is the maximum |
 | exit 2, id of the wrong shape | the render id is not 24-hex | take it from `outputs[].renderId` or `chat renders` |
 | the link 404s at the storage URL | no render exists under that id | locate the id in a view from this session and sign again |
