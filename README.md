@@ -11,7 +11,7 @@ API as tools.
 ## Before you start
 
 You need a StarZero account: sign up at https://app.starzero.ai. Everything that bills (uploads,
-imports, workflow and podcast runs, chat turns, clean renders) draws on the credits of your plan,
+imports, workflow and podcast runs, chat turns and compactions, clean renders) draws on the credits of your plan,
 so pick one in the app before the first of those; listing and inspecting what you already have
 needs no credits. Claude Code is the surface this README describes; Cowork and claude.ai chat are
 covered under "Other surfaces" below.
@@ -70,10 +70,12 @@ billing anything) and asks whether to go ahead. To skip the question, say so ("g
 asking") and it stays skipped for the rest of the session; a line in your `CLAUDE.md` makes that
 permanent. Claude still tells you the cost
 before each billed command, and still asks about decisions that change what runs, such as
-starting a second run while one is active. One compaction runs unasked: when the StarZero agent's
-chat has grown so far that the server refuses the next message until its history is folded into a
-summary, Claude folds it (billed like a turn) and tells you; when the server merely advises one,
-Claude asks at a point where the project holds everything that matters.
+starting a second run while one is active. One billed step gets no question of its own: when a
+chat with the StarZero agent has grown so far that the server asks for its history to be folded
+into a summary, Claude folds it right before your next message, billed like one turn, and tells
+you in that message's confirmation. A bloated history is billed on every turn after it, so this
+saves credits on net. When the server merely advises it, Claude waits for a point where the
+project timeline, renders and artifacts already hold everything that matters.
 
 ## What the plugin downloads, runs and contacts
 

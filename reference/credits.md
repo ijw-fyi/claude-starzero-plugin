@@ -20,7 +20,7 @@ Before any of the billed commands:
 
 1. Run `starzero credits` and say what will run, as the exact command, what it bills, and the balance it draws on (`creditsLeft`, plus the soonest note expiry when one is close): the estimate from `--dry-run` for uploads, "N videos, unestimated" for imports, "one run of template X on N media items" for workflows, "one clip run" for podcasts, "one agent turn" for chats, "one compaction, billed like a turn" for `chat compact`, "a clean render of N seconds" for `--no-watermark`.
 2. Ask once, in words, and wait for the answer. One short question that carries the same line ("Upload 3 files to Interviews for about 48 credits, of 12,400 left. Go ahead?"), with any decision folded into it: a run is already active, validation was skipped, or a flag such as `--force` or `--skip-credit-check` is being considered. The Bash call's `description` repeats the billing line (`Upload 3 files to Interviews (bills ~48 credits, 12,400 left)`), so a permission box, where one appears, shows it too.
-   `chat compact` is the one exception to the question: when the server says the chat must be compacted before the next message, the compaction runs unasked right before that send, named in the send's question; when it only advises one, the chat skill asks at a checkpoint ("Compacting the chat" in the chat skill).
+   `chat compact` is the one billed command that gets no question of its own: it runs right before the next send when the server has asked for it, and the send's question carries it as a statement ("Compacting the chat" in the chat skill says when).
 3. Run it once, after the yes. `workflow instance create` and `podcast-clips create` say so when they return: the run started and is being billed. A create that errored after returning an id, timed out, or was interrupted has started; `waiting.md` covers resuming it. A second create is a second bill and is asked about again.
 
 ## One run at a time
@@ -31,7 +31,7 @@ Workflow runs and podcast-clip runs draw on the same balance as they go. Two run
 
 - `starzero credits` is free and shows the account as a short table: the credits left, the plan and its term end ("free" without a subscription), and the credit notes still holding credits, soonest expiry first. `--json` gives the same as `{ "creditsLeft", "plan", "notes" }`. It needs `billing:read`.
 - `media upload --dry-run` prints the estimate next to the balance (`~N credits (M left)`) and refuses with exit 5 when the estimate exceeds the balance or the storage limit. `--skip-credit-check` bypasses that refusal; offer it only when the user asks to proceed anyway. Any exit 5 for lack of credits points at `starzero credits`.
-- Spend shows up as `creditsUsed` on instance views, per session in the sessions table, and in the `chat send` footer.
+- Spend shows up as `creditsUsed` on instance views, per session in the sessions table, and in the `chat send` and `chat compact` footers.
 - Workflow and podcast runs take a while (minutes to tens of minutes) and can use a large share of a balance. When `creditsLeft` is under 100,000 before a `workflow instance create` or `podcast-clips create`, put a warning in the question ("balance is low for a workflow run: 42,000 credits left") so the user decides with that in view.
 
 ## Waiving the question
