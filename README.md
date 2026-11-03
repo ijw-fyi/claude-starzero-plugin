@@ -62,15 +62,18 @@ Skills trigger on their own from what you say; `/starzero:<skill>` runs one dire
 
 ## Credits and confirmation
 
-Uploads, imports from video URLs, workflow runs, podcast clip runs, chat turns and clean
-(`--no-watermark`) renders spend StarZero credits. Before each one, Claude states what the command
+Uploads, imports from video URLs, workflow runs, podcast clip runs, chat turns, chat compactions
+and clean (`--no-watermark`) renders spend StarZero credits. Before each one, Claude states what the command
 bills and your balance (uploads show the dry-run estimate, for example "about 48 credits, of
 12,400 left"; imports have no estimate, and the server refuses a batch it cannot cover before
 billing anything) and asks whether to go ahead. To skip the question, say so ("go ahead without
 asking") and it stays skipped for the rest of the session; a line in your `CLAUDE.md` makes that
 permanent. Claude still tells you the cost
 before each billed command, and still asks about decisions that change what runs, such as
-starting a second run while one is active.
+starting a second run while one is active. One compaction runs unasked: when the StarZero agent's
+chat has grown so far that the server refuses the next message until its history is folded into a
+summary, Claude folds it (billed like a turn) and tells you; when the server merely advises one,
+Claude asks at a point where the project holds everything that matters.
 
 ## What the plugin downloads, runs and contacts
 

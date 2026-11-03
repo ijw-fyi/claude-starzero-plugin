@@ -9,6 +9,7 @@ StarZero bills in credits. These commands spend them:
 | `workflow instance create` | the whole run, per fan-out item | no |
 | `podcast-clips create` | the whole run | no |
 | `chat send` | the agent turn | no; the footer shows what it cost afterwards |
+| `chat compact` | one summary of the chat's history, billed like a turn | no; the footer shows what it cost afterwards |
 | `output render --no-watermark` | a clean temporary render, per rendered minute | the summed clip length (`durationSeconds`) is the driver; the watermarked default is free |
 
 Billing starts at the request. `workflow instance cancel` stops a run and refunds nothing. Everything else (`list`, `get`, `describe`, `watch`, `search`, `url`, `share`, `download`, `thumbnail`) is free.
@@ -17,8 +18,9 @@ Billing starts at the request. `workflow instance cancel` stops a run and refund
 
 Before any of the billed commands:
 
-1. Run `starzero credits` and say what will run, as the exact command, what it bills, and the balance it draws on (`creditsLeft`, plus the soonest note expiry when one is close): the estimate from `--dry-run` for uploads, "N videos, unestimated" for imports, "one run of template X on N media items" for workflows, "one clip run" for podcasts, "one agent turn" for chats, "a clean render of N seconds" for `--no-watermark`.
+1. Run `starzero credits` and say what will run, as the exact command, what it bills, and the balance it draws on (`creditsLeft`, plus the soonest note expiry when one is close): the estimate from `--dry-run` for uploads, "N videos, unestimated" for imports, "one run of template X on N media items" for workflows, "one clip run" for podcasts, "one agent turn" for chats, "one compaction, billed like a turn" for `chat compact`, "a clean render of N seconds" for `--no-watermark`.
 2. Ask once, in words, and wait for the answer. One short question that carries the same line ("Upload 3 files to Interviews for about 48 credits, of 12,400 left. Go ahead?"), with any decision folded into it: a run is already active, validation was skipped, or a flag such as `--force` or `--skip-credit-check` is being considered. The Bash call's `description` repeats the billing line (`Upload 3 files to Interviews (bills ~48 credits, 12,400 left)`), so a permission box, where one appears, shows it too.
+   `chat compact` is the one exception to the question: when the server says the chat must be compacted before the next message, the compaction runs unasked right before that send, named in the send's question; when it only advises one, the chat skill asks at a checkpoint ("Compacting the chat" in the chat skill).
 3. Run it once, after the yes. `workflow instance create` and `podcast-clips create` say so when they return: the run started and is being billed. A create that errored after returning an id, timed out, or was interrupted has started; `waiting.md` covers resuming it. A second create is a second bill and is asked about again.
 
 ## One run at a time
