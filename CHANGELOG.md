@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.9.0
+
+- The plugin pins CLI 0.17.1. A chat's history can now be folded into one summary the agent reads
+  from then on (`starzero chat compact`, billed like a turn), and the server says when: `chat send`
+  and `chat get` print a warning with the command when the agent is losing track of earlier
+  details, or when one more reply no longer fits. The chat skill runs the compaction right before
+  the next message, with no question of its own, since one compaction costs less than the bloated
+  history it replaces on every later turn; when the server only advises it, the skill waits for a
+  checkpoint, where the project timeline, renders and artifacts already hold everything that
+  matters. `credits.md` names that one unasked command, `waiting.md` and `cli-conventions.md` cover
+  its exit codes and the hints.
+
 ## 0.8.0
 
 - The plugin pins CLI 0.16.0, and a browser login now renews itself, so a long chat turn no longer
