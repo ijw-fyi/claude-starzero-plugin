@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.9.1
+
+- The chat skill says how soon a compaction is due once the server advises one: the context figure
+  in the `chat send` footer on the turn the warning first appeared marks the threshold, a chat a
+  quarter past it can wait a turn or two for a clean checkpoint, and at about double it the first
+  checkpoint is taken and the next messages are shaped so one comes soon.
+
 ## 0.9.0
 
 - The plugin pins CLI 0.17.1. A chat's history can now be folded into one summary the agent reads
