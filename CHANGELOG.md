@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.9.2
+
+- The chat skill follows the agent's loudness levelling: it measures the project's loudness (LUFS,
+  true peak, loudness range) before rendering and levels each clip to a target, -14 LUFS for social
+  video by default and -16 for podcasts, with a music bed set under the dialogue. The cannot-do line
+  keeps a render's bitrate; loudness is off it.
+
 ## 0.9.1
 
 - The chat skill says how soon a compaction is due once the server advises one: the context figure
