@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.9.3
+
+- Shade is gone: the storage-providers skill, `scripts/shade`, its reference and tests. This
+  plugin covers StarZero alone; a third-party service brings its own limitations, and those are
+  not this plugin's to cover. Shade stays as one of the URL kinds `starzero media import` accepts,
+  since StarZero's server does that fetch. The plugin removes nothing from your machine: a Shade
+  key stored by the old script sits in `~/.starzero/shade-credentials` (or under
+  `$STARZERO_CONFIG_DIR`), yours to delete, and rclone and jq were yours to begin with.
+
 ## 0.9.2
 
 - The SessionStart hook is gone. The Claude plugin directory accepts a hook of type `command` only

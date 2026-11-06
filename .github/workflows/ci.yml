@@ -27,5 +27,3 @@ jobs:
         run: scripts/check-versions.sh
       - name: Launcher installs the pinned CLI
         run: test/launcher.sh
-      - name: The shade script behaves offline against fake curl and rclone
-        run: test/shade.sh
