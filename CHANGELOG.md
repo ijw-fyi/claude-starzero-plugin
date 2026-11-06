@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.9.2
+
+- The SessionStart hook is gone. The Claude plugin directory accepts a hook of type `command` only
+  from a Verified organization, and StarZero is not one yet, so the directory refused 0.9.1. The
+  plugin ships no hooks: nothing goes on PATH and nothing prints at session start.
+- A `cli` skill takes over what the hook's line said. Its description, which Claude sees in every
+  session, says the CLI is not on PATH and the plugin's launcher runs it, and catches any StarZero
+  request the other skills leave open; its body gives the launcher's path, `--help`, the exit 3
+  login procedure, and that the unauthenticated connector does not affect the CLI. In a hookless
+  session without it, Claude ran a bare `starzero` and found whatever the machine had; with it,
+  Claude loaded the skill first and ran the launcher by path.
+- `test/session-start.sh` is gone with the hook.
+
 ## 0.9.1
 
 - The chat skill says how soon a compaction is due once the server advises one: the context figure
