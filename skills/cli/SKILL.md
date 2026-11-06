@@ -5,7 +5,7 @@ description: 'Where the starzero CLI is and how it is run: the CLI is not on PAT
 
 # The starzero CLI
 
-The plugin reaches StarZero through the `starzero` CLI. This skill says where it is; the other starzero skills carry the procedures for their jobs, and a request one of them covers (uploading, finding moments, a chat with the agent, a workflow run, clips, sharing a render, Shade, account skills, setup) goes to that skill.
+The plugin reaches StarZero through the `starzero` CLI. This skill says where it is; the other starzero skills carry the procedures for their jobs, and a request one of them covers (uploading, finding moments, a chat with the agent, a workflow run, clips, sharing a render, account skills, setup) goes to that skill.
 
 ## Where it is
 
