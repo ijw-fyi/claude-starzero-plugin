@@ -57,6 +57,7 @@ estimate before uploads and checks a graphic rendered as MP4 before it is handed
 | `starzero:starzero-skills` | "save this as a StarZero skill", "show my StarZero skills", "pull my cold-open skill" (skills for the StarZero agent, separate from Claude's own) |
 | `starzero:storage-providers` | "upload this render to our Shade drive", "list my Shade drives", "pull this clip from Shade into StarZero" (Shade is the first provider; you install rclone and jq, the plugin downloads nothing for it) |
 | `starzero:setup` | install, log in, check scopes (you run this one yourself) |
+| `starzero:cli` | anything else that names StarZero or the CLI: "which starzero version is installed", "list my libraries", "what can starzero do" (where the CLI is and how it runs; the other skills carry the procedures) |
 
 Skills trigger on their own from what you say; `/starzero:<skill>` runs one directly.
 
@@ -127,16 +128,10 @@ project timeline, renders and artifacts already hold everything that matters.
   `starzero-cli` in Credential Manager (Windows). The connector's sign-in token is separate and
   lives where your MCP client keeps such tokens: Claude Code's credential store, or claude.ai for
   chat; disconnecting the connector there ends it.
-- One hook, at session start: `scripts/session-start` puts the plugin's `scripts` folder on the
-  PATH of the session's Bash commands, so a bare `starzero` resolves to the launcher (nothing is
-  installed until the first command runs), and checks whether `~/.starzero/credentials` (or
-  `$STARZERO_CONFIG_DIR/credentials`) exists or `STARZERO_API_KEY` is set. It prints one line for
-  Claude either way: with a login stored, that the CLI is the route to StarZero in
-  this session and that an exit 3 means logging in again; without one, to run `/starzero:setup`
-  before the first StarZero request. The line
-  also says the bundled connector is optional, since Claude Code reports it as unauthenticated until
-  you connect it, and Claude would otherwise take StarZero as unavailable. It reads nothing else and
-  contacts nothing. No plugin options. It bundles
+- No hooks: nothing runs at session start or around a tool call, and nothing goes on PATH. The
+  skills call the launcher by its path inside the plugin folder, and the `starzero:cli` skill tells
+  Claude where it is for any StarZero request the other skills leave open. Nothing is installed
+  until the first command runs. No plugin options. It bundles
   one remote MCP server, the StarZero connector at `https://mcp.starzero.ai/mcp`, described below;
   no local MCP server.
 
@@ -174,7 +169,6 @@ claude --plugin-dir .          # load the working tree for one session
 # Opening this repo in Claude Code also offers `.mcp.json` as a project MCP server; approve or skip it.
 claude plugin validate . --strict
 test/launcher.sh               # downloads the pinned CLI into a temp HOME and runs it
-test/session-start.sh          # the SessionStart hook says a login is stored or setup first, and the connector is optional
 test/shade.sh                  # scripts/shade against fake curl and rclone on PATH (needs jq)
 scripts/check-versions.sh
 ```
