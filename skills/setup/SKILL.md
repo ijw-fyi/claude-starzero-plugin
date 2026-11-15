@@ -21,7 +21,7 @@ Installs the pinned `starzero` CLI and ffprobe, logs the user in, then checks th
 3. Run `starzero auth status`. Exit 0 shows whose credential is stored, its type, scopes, expiry and whether it renews; relay who it is, the type and whether it renews, and go to step 5. Exit 3 means nothing usable is stored: no login yet, a browser login made with a CLI before 0.16.0, or one revoked on the server; go to step 4. Any other exit: relay `hint` from stderr.
 4. Log the user in by the procedure in `auth.md`, "Logging in from a skill". Ask nothing about terminals or shells; the user may have never opened one.
    - With a browser on this machine (Claude Code on a desktop, Cowork): say a browser tab will open, run `starzero auth login` in the background, relay the URL from its output when no tab opened, and continue once the command ends. The login page asks for every scope the CLI uses, so one login serves every skill.
-   - Without a browser here, or when no tab opened: `starzero auth login --no-browser` prints a URL for the user to open on any device; they paste back the address the login ended on, and `starzero auth login --callback "<address>"` finishes it.
+   - Without a browser here, or when no tab opened: `starzero auth login --no-browser` prints a URL for the user to open on any device; the page they log in on shows a sign-in code; they paste it back, and `starzero auth login --code "<code>"` finishes it.
    - An API key when the user has one and prefers it: `starzero auth login --api-key <key>`; the user makes one at https://app.starzero.ai/settings/api-keys with the scopes in `auth.md`. A key typed into the chat stays in this conversation's history; say so once.
    - Cloud sessions: the user sets `STARZERO_API_KEY` in the environment's settings. It takes precedence over every stored credential.
    Then re-run `starzero auth status`.
@@ -44,7 +44,7 @@ One line per check: CLI version; ffprobe (installed, found on PATH, or the brew 
 | `ensure-tools ffprobe` reports a checksum mismatch twice | the publisher's daily rebuild was mid-swap | run it again later; uploads work without the estimate meanwhile |
 | exit 3 `AUTH` "Not logged in" on `auth status` | nothing stored, or a browser login from a CLI before 0.16.0 | step 4; a login from before 0.16.0 is done once more |
 | `auth login` times out or is aborted | the user did not finish in the browser; nothing was stored | run it again |
-| `--callback` says no login is in progress, or the callback did not belong to this attempt | `--no-browser` was not run, ran over an hour ago, or the address is from an older URL | run `--no-browser` again and use its URL |
+| `--code` says no login is in progress, or is not a sign-in code, or `PENDING_LOGIN_UNREADABLE`, or `Login failed` | `--no-browser` was not run, or ran with a CLI before 0.18.0; something other than the code was pasted; or the code was already used, is older than ten minutes, came from an earlier attempt, or `--no-browser` ran over an hour ago | run `--no-browser` again and use the code its page shows |
 | exit 3 `AUTH` on `auth login --api-key` | key mistyped or revoked; nothing was stored | new key from the API keys page |
 | exit 3 `CREDENTIALS_INSECURE` | credentials file readable by others (macOS and Linux) | `chmod 600 ~/.starzero/credentials` |
 | exit 3 on one command while `auth status` passes | the key lacks a scope for that command | new key with the scope |

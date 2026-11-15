@@ -7,7 +7,7 @@
 | Browser login | `starzero auth login`: the CLI opens the login page, waits, stores the login | renews itself as commands run, with no routine log-in; ends with `auth logout` or a revocation on the server | everything the CLI uses except deleting |
 | API key | created at https://app.starzero.ai/settings/api-keys, stored with `starzero auth login --api-key <key>` (or `--stdin`) | until revoked | the scopes chosen when the key was made |
 
-The browser login is the route everywhere: Claude Code and Cowork alike, with nothing pasted into the chat. On a machine without a browser, `--no-browser` prints the URL for the user to open on any device (a phone will do) and takes the address that page ends on. An API key is for cloud sessions, where `STARZERO_API_KEY` is set outside the plugin, and for users who prefer one.
+The browser login is the route everywhere: Claude Code and Cowork alike, with nothing pasted into the chat. On a machine without a browser, `--no-browser` prints the URL for the user to open on any device (a phone will do) and takes the sign-in code the page it ends on shows. An API key is for cloud sessions, where `STARZERO_API_KEY` is set outside the plugin, and for users who prefer one.
 
 A browser login belongs to one machine. A copy of the credentials file used elsewhere gets the login revoked on both at the next renewal, so each machine logs in for itself, or an API key shares the access. Two machines logged in from one browser can share a login, and `auth logout` on one ends both.
 
@@ -31,10 +31,10 @@ In order:
 **Without a browser on this machine** (containers, remote hosts, a desktop where no tab opened):
 
 1. Run `starzero auth login --no-browser`. It prints the login URL and exits; the half-finished login waits in `~/.starzero/login-pending.json` (owner-only) for up to an hour.
-2. Give the user the URL to open on any device (a phone will do). The login ends on a page that cannot load, at `http://127.0.0.1:<port>/callback?...`; ask the user to paste that page's full address into the chat.
-3. Run `starzero auth login --callback "<the pasted address>"`. Exit 0 means the token is stored; `starzero auth status` confirms it.
+2. Give the user the URL to open on any device (a phone will do). The page they log in on shows a sign-in code with a Copy button; ask the user to paste the code into the chat.
+3. Run `starzero auth login --code "<the code>"`. Exit 0 means the token is stored; `starzero auth status` confirms it.
 
-The pasted address holds a one-time code that only this pending login can redeem, so it is safe in the chat. "No login in progress" (exit 2) means step 1 has not run or the hour passed; "the callback did not belong to this login attempt" (exit 3) means the address came from an older URL. Either way, start over from step 1.
+The code is redeemed only together with the verifier this machine kept in step 1, and it is spent on first use, so the user pasting it into this chat is the intended use; it lives ten minutes once the page shows it. Ask only for the code of a login this session started: a login link someone else sent the user starts that person's login, and a code handed to them logs them in as the user. "No login in progress" (exit 2) means step 1 has not run; "--code is not a sign-in code" (exit 2) means something other than the code was pasted (the page's address, an empty value); `PENDING_LOGIN_UNREADABLE` (exit 1) means the pending login was written by a CLI before 0.18.0; `Login failed` (exit 3) means the code was already used, is older than ten minutes, came from an earlier `--no-browser` run, or step 1 ran over an hour ago. Either way, start over from step 1, which replaces the pending login.
 
 **API key instead**: `starzero auth login --api-key <key>` verifies the key against the server before storing it. The user makes one at the API keys page with the scopes in the table below. Use it when the user has a key and prefers it, or for a cloud session, where `STARZERO_API_KEY` in the environment is read first.
 
