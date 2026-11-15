@@ -28,11 +28,11 @@ Then, in a Claude Code session:
 /starzero:setup
 ```
 
-Until you are logged in, Claude is told at the start of each session to run setup first, so asking
-for a StarZero job straight away works too.
+Asking for a StarZero job straight away works too: the skill that takes it installs the CLI and
+logs you in when needed.
 
-Setup downloads the CLI on first use, installs `ffprobe` next to it on Linux and Windows, then logs
-you in: a browser tab opens on the StarZero login page, and the CLI stores the resulting token in
+Setup downloads the CLI on first use, asks you to install `ffprobe` if you want upload estimates, then
+logs you in: a browser tab opens on the StarZero login page, and the CLI stores the resulting token in
 `~/.starzero/credentials`, owner-only. Nothing is pasted into the chat. A browser login renews itself; any
 skill logs you in again if it ever ends, and a login made with a CLI before 0.16.0 asks for that once.
 On a machine without a browser, setup gives you a URL to open on any device and asks for the
@@ -40,8 +40,9 @@ sign-in code the page you log in on shows. An API key from
 https://app.starzero.ai/settings/api-keys works too (`starzero auth login --api-key`), for example
 in a cloud session where `STARZERO_API_KEY` is set as an environment variable.
 
-On macOS, install ffprobe with `brew install ffmpeg`; it is optional: it powers the credit
-estimate before uploads and checks a graphic rendered as MP4 before it is handed over.
+ffprobe is optional: it powers the credit estimate before uploads and checks a graphic rendered as
+MP4 before it is handed over. Setup shows the install line for your system (`brew install ffmpeg`
+on macOS).
 
 ## What you can ask for
 
@@ -80,13 +81,13 @@ project timeline, renders and artifacts already hold everything that matters.
 
 - The `starzero` CLI, about 40 MB, from
   [ijw-fyi/starzero-cli-releases](https://github.com/ijw-fyi/starzero-cli-releases) on GitHub, at
-  the version pinned in `reference/CLI_VERSION`, verified against the release's `SHA256SUMS`
-  before it runs. It is stored in `~/.starzero/bin/<version>/` (or
+  the version pinned in `reference/install.md`, verified against the release's `SHA256SUMS`
+  before it runs. The plugin ships no program: the skills run the download commands written in
+  that file. It is stored in `~/.starzero/bin/<version>/` (or
   `$STARZERO_CONFIG_DIR/bin/<version>/`). A plugin update may move the pin.
-- `ffprobe` on Linux and Windows, 100 to 200 MB, an LGPL build from
-  [BtbN/FFmpeg-Builds](https://github.com/BtbN/FFmpeg-Builds) verified against the publisher's
-  checksums, stored next to the CLI.
-- Hosts contacted: `github.com` and its release downloads for the two binaries; StarZero's own API
+- Nothing else. `ffprobe` is optional and yours to install with your package manager; setup shows
+  the line for your system.
+- Hosts contacted: `github.com` and its release downloads for the CLI; StarZero's own API
   (`api.starzero.ai`) and app (`app.starzero.ai`) for everything the skills do; `mcp.starzero.ai`
   only where the connector is used. Your StarZero credential is sent only to StarZero. A playlist, channel or
   folder URL you hand the plugin is listed by StarZero's server (`starzero media resolve`), as the
@@ -113,10 +114,10 @@ project timeline, renders and artifacts already hold everything that matters.
   `starzero-cli` in Credential Manager (Windows). The connector's sign-in token is separate and
   lives where your MCP client keeps such tokens: Claude Code's credential store, or claude.ai for
   chat; disconnecting the connector there ends it.
-- No hooks: nothing runs at session start or around a tool call, and nothing goes on PATH. The
-  skills call the launcher by its path inside the plugin folder, and the `starzero:cli` skill tells
-  Claude where it is for any StarZero request the other skills leave open. Nothing is installed
-  until the first command runs. No plugin options. It bundles
+- No hooks and no scripts: nothing runs at session start or around a tool call, nothing goes on
+  PATH, and the plugin folder holds no program. The skills run the CLI by its path under
+  `~/.starzero/bin/`, and the `starzero:cli` skill tells Claude where it is for any StarZero
+  request the other skills leave open. Nothing is installed until the first command runs. No plugin options. It bundles
   one remote MCP server, the StarZero connector at `https://mcp.starzero.ai/mcp`, described below;
   no local MCP server.
 
@@ -153,14 +154,17 @@ On claude.ai chat, if both appear, connect one; both carry the same tools.
 claude --plugin-dir .          # load the working tree for one session
 # Opening this repo in Claude Code also offers `.mcp.json` as a project MCP server; approve or skip it.
 claude plugin validate . --strict
-test/launcher.sh               # downloads the pinned CLI into a temp HOME and runs it
-scripts/check-versions.sh
 ```
 
-Bumping the CLI: edit `reference/CLI_VERSION`, run `scripts/starzero --help` to review new
-commands, update the skills and `reference/` docs that mention them, bump the plugin version in
-both manifests, add a CHANGELOG entry, tag `vX.Y.Z`.
+CI (`.github/workflows/ci.yml`) validates the manifests, checks that the tree holds no script or
+file type the plugin directory refuses, that the skills name the CLI version `reference/install.md`
+pins, and runs that file's install commands in a temp HOME.
+
+Bumping the CLI: change the version in `reference/install.md` (the sentence and the snippet) and in
+every skill's prerequisites line, run the installed CLI's `--help` to review new commands, update the
+skills and `reference/` docs that mention them, bump the plugin version in both manifests, add a
+CHANGELOG entry, tag `vX.Y.Z`.
 
 ## License
 
-MIT. The `starzero` CLI and ffprobe are downloaded at run time under their own licences.
+MIT. The `starzero` CLI is downloaded at run time under its own licence.
