@@ -10,7 +10,7 @@ Hands StarZero output over as a link. A workflow or podcast run is shared whole:
 
 ## Prerequisites
 
-- This skill runs the `starzero` CLI in the shell. Every `starzero ...` below is run as `${CLAUDE_PLUGIN_ROOT}/scripts/starzero ...`: that launcher installs the pinned CLI on first use and hands over to it. Without a shell (claude.ai chat), the plugin's StarZero connector offers the same API as tools and carries its own instructions; the commands in this skill apply where a shell exists.
+- This skill runs the `starzero` CLI in the shell. Every `starzero ...` below is run as `$HOME/.starzero/bin/0.18.0/starzero ...` (`starzero.exe` on Windows); nothing is on PATH. When that file is missing, install it with the commands in `${CLAUDE_PLUGIN_ROOT}/reference/install.md`. Without a shell (claude.ai chat), the plugin's StarZero connector offers the same API as tools and carries its own instructions; the commands in this skill apply where a shell exists.
 - Exit 3 from any command means the browser login was revoked or comes from a CLI before 0.16.0, or the credential is missing, invalid or lacks a scope. Log in again by the procedure in `${CLAUDE_PLUGIN_ROOT}/reference/auth.md` ("Logging in from a skill"), then re-run the command; when that fails, the user runs `/starzero:setup`.
 
 ## Steps

@@ -10,7 +10,7 @@ Gets the media the user names (`$ARGUMENTS`: files, a folder to expand into its 
 
 ## Prerequisites
 
-- This skill runs the `starzero` CLI in the shell. Every `starzero ...` below is run as `${CLAUDE_PLUGIN_ROOT}/scripts/starzero ...`: that launcher installs the pinned CLI on first use and hands over to it. Without a shell (claude.ai chat), the plugin's StarZero connector offers the same API as tools and carries its own instructions; the commands in this skill apply where a shell exists.
+- This skill runs the `starzero` CLI in the shell. Every `starzero ...` below is run as `$HOME/.starzero/bin/0.18.0/starzero ...` (`starzero.exe` on Windows); nothing is on PATH. When that file is missing, install it with the commands in `${CLAUDE_PLUGIN_ROOT}/reference/install.md`. Without a shell (claude.ai chat), the plugin's StarZero connector offers the same API as tools and carries its own instructions; the commands in this skill apply where a shell exists.
 - Exit 3 from any command means the browser login was revoked or comes from a CLI before 0.16.0, or the credential is missing, invalid or lacks a scope. Log in again by the procedure in `${CLAUDE_PLUGIN_ROOT}/reference/auth.md` ("Logging in from a skill"), then re-run the command; when that fails, the user runs `/starzero:setup`.
 
 ## Steps
@@ -53,7 +53,7 @@ Gets the media the user names (`$ARGUMENTS`: files, a folder to expand into its 
 | exit 5 on `media import` | the server refused the batch for credits or storage; nothing billed | report; `starzero credits` shows the balance, and there is no bypass |
 | exit 1 on `media resolve` | the server found no video behind the URL: a private page, or one that is not a video, playlist, channel or supported share | relay the message; check the link with the user |
 | exit 6 on `media resolve`, warning `the list is incomplete` | the call ended while the server was still listing; the rows so far are on stdout | say the list was cut short; a new call starts over, so go on with those rows |
-| warning that ffprobe is missing | estimate and non-media filter skipped | say the upload is unestimated; `/starzero:setup` installs ffprobe |
+| warning that ffprobe is missing | estimate and non-media filter skipped | say the upload is unestimated; `/starzero:setup` shows the ffprobe install line |
 | rows `skipped` (`too-small`, `non-media`) on upload | under 1 KiB, or no audio and no video stream | report; these files stay out |
 | rows `already-uploaded` / `already-imported` | same fingerprint, or the same video by platform id, already in the library | use the printed media id; nothing to send |
 | upload or import refuses `--folder` (exit 4) | the path does not exist; every import row prints as `skipped` (`not attempted`), nothing sent | `folder create --path`, then re-run |

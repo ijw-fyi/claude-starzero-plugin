@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.9.5
+
+- The plugin ships no program. The Claude plugin directory accepts a script, or any file that is
+  not Markdown, text, JSON, YAML or an image, only from a Verified organization, and it refused
+  0.9.4 for the launcher. `scripts/starzero`, `scripts/ensure-tools`, the version pin file and the
+  tests are gone. `reference/install.md` says where the CLI lives
+  (`~/.starzero/bin/0.18.0/starzero`) and carries the download the skills run when it is missing:
+  the release asset for the machine, checked against the release's `SHA256SUMS`, unpacked into the
+  version folder. Every skill names that path instead of the launcher.
+- ffprobe is no longer downloaded. Setup asks for it as an optional install, with the package
+  manager's line for the system; uploads work without it, unestimated.
+- The icon is a PNG. A version folder from an earlier plugin under `~/.starzero/bin/` is yours to
+  delete.
+
 ## 0.9.4
 
 - The plugin pins CLI 0.18.0. A login without a browser (`starzero auth login --no-browser`) now

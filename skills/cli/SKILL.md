@@ -1,6 +1,6 @@
 ---
 name: cli
-description: 'Where the starzero CLI is and how it is run: the CLI is not on PATH, the plugin''s launcher runs it. Use for any StarZero or starzero request that no other starzero skill covers, and before any bare `starzero` command, such as "which starzero version is installed", "list my libraries", "show my chats", "what can starzero do", or a starzero command the user names.'
+description: 'Where the starzero CLI is and how it is run: the CLI is not on PATH, it lives under ~/.starzero/bin/ and this skill installs it when it is missing. Use for any StarZero or starzero request that no other starzero skill covers, and before any bare `starzero` command, such as "which starzero version is installed", "list my libraries", "show my chats", "what can starzero do", or a starzero command the user names.'
 ---
 
 # The starzero CLI
@@ -9,8 +9,9 @@ The plugin reaches StarZero through the `starzero` CLI. This skill says where it
 
 ## Where it is
 
-- Every `starzero ...` command is run as `${CLAUDE_PLUGIN_ROOT}/scripts/starzero ...`. That launcher installs the pinned CLI on first use and hands over to it. Nothing puts it on PATH, so a bare `starzero` fails, and a `starzero` found elsewhere on the machine is another install, not the plugin's.
-- A command meant for the user's own terminal carries the absolute path: `echo "${CLAUDE_PLUGIN_ROOT}/scripts/starzero"` prints it.
+- Every `starzero ...` command is run as `$HOME/.starzero/bin/0.18.0/starzero ...` (`starzero.exe` on Windows; `$STARZERO_CONFIG_DIR` replaces `$HOME/.starzero` when it is set). Nothing puts it on PATH, so a bare `starzero` fails, and a `starzero` found elsewhere on the machine is another install, not the plugin's.
+- When that file is missing, install it with the commands in `${CLAUDE_PLUGIN_ROOT}/reference/install.md`: the release asset for this machine from GitHub, checked against the release's `SHA256SUMS`, unpacked into the version folder. The plugin itself holds no program.
+- A command meant for the user's own terminal carries that absolute path.
 - `starzero --help` lists the command groups; `starzero <group> --help` lists each group's commands. `${CLAUDE_PLUGIN_ROOT}/reference/cli-conventions.md` explains exit codes and output shapes: exit codes decide, stdout informs.
 
 ## Login

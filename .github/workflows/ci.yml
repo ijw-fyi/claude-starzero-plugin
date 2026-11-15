@@ -13,17 +13,42 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Install the Claude Code CLI and shellcheck
-        run: |
-          npm install --global @anthropic-ai/claude-code
-          sudo apt-get update -qq && sudo apt-get install -y -qq shellcheck jq
+      - name: Install the Claude Code CLI
+        run: npm install --global @anthropic-ai/claude-code
       - name: Validate the plugin and marketplace manifests
         run: |
           claude plugin validate . --strict
           claude plugin validate .claude-plugin/plugin.json --strict
-      - name: Lint the shell scripts
-        run: shellcheck -s sh scripts/* test/*.sh
-      - name: Manifest versions agree
-        run: scripts/check-versions.sh
-      - name: Launcher installs the pinned CLI
-        run: test/launcher.sh
+      - name: The tree holds only what the plugin directory accepts
+        # Markdown, text, JSON, YAML and the listed image types; nothing that starts with #!
+        run: |
+          status=0
+          for f in $(git ls-files); do
+            case "$f" in
+              *.md|*.txt|*.json|*.yml|*.yaml|*.png|*.jpg|*.jpeg|*.gif|*.webp|*.ico|LICENSE|.gitignore) ;;
+              *) echo "$f: not a file type the plugin directory accepts"; status=1 ;;
+            esac
+            if [ "$(head -c 2 "$f")" = "#!" ]; then echo "$f: starts with #!"; status=1; fi
+          done
+          exit $status
+      - name: Manifests and skills agree on the versions
+        run: |
+          v=$(sed -n 's/^The pinned version is \([0-9.][0-9.]*\)\.$/\1/p' reference/install.md)
+          test -n "$v" || { echo "reference/install.md names no pinned version"; exit 1; }
+          grep -q "^v=$v;" reference/install.md || { echo "the install snippet pins a different version than the sentence"; exit 1; }
+          for f in skills/*/SKILL.md; do
+            grep -q "bin/$v/starzero" "$f" || { echo "$f does not name CLI $v"; exit 1; }
+          done
+          pv=$(jq -r .version .claude-plugin/plugin.json); mv=$(jq -r '.plugins[0].version' .claude-plugin/marketplace.json)
+          test "$pv" = "$mv" || { echo "plugin.json is $pv but marketplace.json is $mv"; exit 1; }
+          pd=$(jq -r .description .claude-plugin/plugin.json); md=$(jq -r '.plugins[0].description' .claude-plugin/marketplace.json)
+          test "$pd" = "$md" || { echo "plugin.json and marketplace.json describe the plugin differently"; exit 1; }
+          echo "versions agree: plugin $pv, cli $v; descriptions agree"
+      - name: The install commands in reference/install.md install the pinned CLI
+        run: |
+          v=$(sed -n 's/^The pinned version is \([0-9.][0-9.]*\)\.$/\1/p' reference/install.md)
+          home=$(mktemp -d)
+          awk '/^```sh$/{f=1;next} /^```$/{f=0} f' reference/install.md > "$home/install.sh"
+          HOME="$home" sh "$home/install.sh"
+          got=$(HOME="$home" "$home/.starzero/bin/$v/starzero" --version)
+          test "$got" = "$v" || { echo "installed $got, expected $v"; exit 1; }

@@ -1,23 +1,23 @@
 ---
 name: setup
-description: 'Installs and authenticates the starzero CLI: downloads the pinned binary and ffprobe, logs in through the browser (or an API key), checks the stored credential with auth status, compares its scopes with the jobs the user wants, and shows the credit balance. Use when the user says "set up starzero", "log in to StarZero", "my login expired", "no API key", "how many credits do I have", "which scopes do I need", or after any starzero skill exits 3.'
+description: 'Installs and authenticates the starzero CLI: downloads the pinned binary, asks for ffprobe as an optional install, logs in through the browser (or an API key), checks the stored credential with auth status, compares its scopes with the jobs the user wants, and shows the credit balance. Use when the user says "set up starzero", "log in to StarZero", "my login expired", "no API key", "how many credits do I have", "which scopes do I need", or after any starzero skill exits 3.'
 disable-model-invocation: true
 ---
 
 # Setup
 
-Installs the pinned `starzero` CLI and ffprobe, logs the user in, then checks that a credential with the right scopes reaches the CLI. Every other skill in this plugin assumes these checks pass.
+Installs the pinned `starzero` CLI, asks for ffprobe, logs the user in, then checks that a credential with the right scopes reaches the CLI. Every other skill in this plugin assumes these checks pass.
 
 ## Prerequisites
 
-- This skill runs the `starzero` CLI in the shell. Every `starzero ...` below is run as `${CLAUDE_PLUGIN_ROOT}/scripts/starzero ...`: that launcher installs the pinned CLI on first use and hands over to it. Without a shell (claude.ai chat), the user connects StarZero from the plugin's Connectors tab; the connector signs in on its own and nothing below applies.
+- This skill runs the `starzero` CLI in the shell. Every `starzero ...` below is run as `$HOME/.starzero/bin/0.18.0/starzero ...` (`starzero.exe` on Windows); nothing is on PATH. When that file is missing, install it with the commands in `${CLAUDE_PLUGIN_ROOT}/reference/install.md`. Without a shell (claude.ai chat), the user connects StarZero from the plugin's Connectors tab; the connector signs in on its own and nothing below applies.
 - With a shell, the plugin's StarZero connector (shown by `/mcp` as `plugin:starzero:starzero`) is not used and can stay disconnected; the CLI login below is the only one this surface needs.
 - Exit 3 from any command means the browser login was revoked or comes from a CLI before 0.16.0, or the credential is missing, invalid or lacks a scope. Log in again by the procedure in `${CLAUDE_PLUGIN_ROOT}/reference/auth.md` ("Logging in from a skill"), then re-run the command; when that fails, the user runs `/starzero:setup`.
 
 ## Steps
 
-1. Run `starzero --version`. The first run downloads the pinned CLI (the version in `${CLAUDE_PLUGIN_ROOT}/reference/CLI_VERSION`) from GitHub releases, verifies its SHA256 sum, then prints the version. A download failure prints the URL and an "offline?" hint; relay both.
-2. Run `${CLAUDE_PLUGIN_ROOT}/scripts/ensure-tools ffprobe`. On Linux and Windows this fetches a 100-200 MB LGPL build into the CLI's folder, verified against the publisher's checksums. On macOS it looks on PATH and prints `brew install ffmpeg` when absent, exit 0. ffprobe is optional: it powers the upload credit estimate and the non-media filter. Relay the one-line output.
+1. Run `starzero --version`. When the file is missing, install it with the commands in `${CLAUDE_PLUGIN_ROOT}/reference/install.md` (the release asset for this machine, checked against the release's `SHA256SUMS`), which end by printing the version. A failed step names the URL or the file; relay it with the error.
+2. Run `command -v ffprobe`. When it finds nothing, ask the user to install it, with the line for their system from the ffprobe table in `install.md`, and say it is optional: it powers the upload credit estimate and the non-media filter, and everything else works without it. Carry on either way.
 3. Run `starzero auth status`. Exit 0 shows whose credential is stored, its type, scopes, expiry and whether it renews; relay who it is, the type and whether it renews, and go to step 5. Exit 3 means nothing usable is stored: no login yet, a browser login made with a CLI before 0.16.0, or one revoked on the server; go to step 4. Any other exit: relay `hint` from stderr.
 4. Log the user in by the procedure in `auth.md`, "Logging in from a skill". Ask nothing about terminals or shells; the user may have never opened one.
    - With a browser on this machine (Claude Code on a desktop, Cowork): say a browser tab will open, run `starzero auth login` in the background, relay the URL from its output when no tab opened, and continue once the command ends. The login page asks for every scope the CLI uses, so one login serves every skill.
@@ -34,14 +34,13 @@ Nothing in this skill spends credits. `--version`, `--help`, `auth status` and `
 
 ## Report back
 
-One line per check: CLI version; ffprobe (installed, found on PATH, or the brew hint); who the credential belongs to, its type and whether it renews; scopes missing for the jobs named (API keys only); credits left and plan; library access. The report repeats no key, even when the user typed one earlier.
+One line per check: CLI version; ffprobe (found on PATH, or the install line shown); who the credential belongs to, its type and whether it renews; scopes missing for the jobs named (API keys only); credits left and plan; library access. The report repeats no key, even when the user typed one earlier.
 
 ## Failure modes
 
 | Symptom | Meaning | What to do |
 | --- | --- | --- |
-| `starzero --version` fails after `ensure-tools starzero` | download blocked or the release is missing | relay the URL and hint; check network |
-| `ensure-tools ffprobe` reports a checksum mismatch twice | the publisher's daily rebuild was mid-swap | run it again later; uploads work without the estimate meanwhile |
+| the install commands fail | download blocked, the release missing, or a checksum that did not match; nothing was installed | relay the URL and the error; check the network, then run them again |
 | exit 3 `AUTH` "Not logged in" on `auth status` | nothing stored, or a browser login from a CLI before 0.16.0 | step 4; a login from before 0.16.0 is done once more |
 | `auth login` times out or is aborted | the user did not finish in the browser; nothing was stored | run it again |
 | `--code` says no login is in progress, or is not a sign-in code, or `PENDING_LOGIN_UNREADABLE`, or `Login failed` | `--no-browser` was not run, or ran with a CLI before 0.18.0; something other than the code was pasted; or the code was already used, is older than ten minutes, came from an earlier attempt, or `--no-browser` ran over an hour ago | run `--no-browser` again and use the code its page shows |
@@ -54,5 +53,6 @@ One line per check: CLI version; ffprobe (installed, found on PATH, or the brew 
 
 ## Reference files
 
+- `${CLAUDE_PLUGIN_ROOT}/reference/install.md`: read in step 1 when the CLI is missing, and in step 2 for the ffprobe line.
 - `${CLAUDE_PLUGIN_ROOT}/reference/auth.md`: read before step 4 and step 5.
 - `${CLAUDE_PLUGIN_ROOT}/reference/cli-conventions.md`: read when an exit code other than 0 or 3 appears.
