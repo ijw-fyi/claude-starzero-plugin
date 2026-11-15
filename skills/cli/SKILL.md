@@ -1,6 +1,6 @@
 ---
 name: cli
-description: 'Where the starzero CLI is and how it is run: the CLI is not on PATH, it lives under ~/.starzero/bin/ and this skill installs it when it is missing. Use for any StarZero or starzero request that no other starzero skill covers, and before any bare `starzero` command, such as "which starzero version is installed", "list my libraries", "show my chats", "what can starzero do", or a starzero command the user names.'
+description: 'Where the starzero CLI is and how it is run: the CLI is not on PATH; run it as $HOME/.starzero/bin/0.18.0/starzero, and this skill installs it there when it is missing. Use for any StarZero or starzero request that no other starzero skill covers, and before any bare `starzero` command, such as "which starzero version is installed", "list my libraries", "show my chats", "what can starzero do", or a starzero command the user names.'
 ---
 
 # The starzero CLI
