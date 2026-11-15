@@ -44,7 +44,7 @@ One line per check: CLI version; ffprobe (installed, found on PATH, or the brew 
 | `ensure-tools ffprobe` reports a checksum mismatch twice | the publisher's daily rebuild was mid-swap | run it again later; uploads work without the estimate meanwhile |
 | exit 3 `AUTH` "Not logged in" on `auth status` | nothing stored, or a browser login from a CLI before 0.16.0 | step 4; a login from before 0.16.0 is done once more |
 | `auth login` times out or is aborted | the user did not finish in the browser; nothing was stored | run it again |
-| `--code` says no login is in progress, or is not a sign-in code, or `Login failed` | `--no-browser` was not run, ran over an hour ago or with a CLI before 0.18.0; something other than the code was pasted; or the code was already used, is older than ten minutes, or came from an earlier attempt | run `--no-browser` again and use the code its page shows |
+| `--code` says no login is in progress, or is not a sign-in code, or `PENDING_LOGIN_UNREADABLE`, or `Login failed` | `--no-browser` was not run, or ran with a CLI before 0.18.0; something other than the code was pasted; or the code was already used, is older than ten minutes, came from an earlier attempt, or `--no-browser` ran over an hour ago | run `--no-browser` again and use the code its page shows |
 | exit 3 `AUTH` on `auth login --api-key` | key mistyped or revoked; nothing was stored | new key from the API keys page |
 | exit 3 `CREDENTIALS_INSECURE` | credentials file readable by others (macOS and Linux) | `chmod 600 ~/.starzero/credentials` |
 | exit 3 on one command while `auth status` passes | the key lacks a scope for that command | new key with the scope |

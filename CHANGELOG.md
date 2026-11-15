@@ -8,8 +8,8 @@
   is spent on first use and redeemed only with the verifier kept by the machine that ran
   `--no-browser`, so the user pasting it into the chat of the agent that started the login is the
   intended use. The auth reference and the setup skill say that, and what each refusal of `--code`
-  means. A `--no-browser` login started with the previous CLI reads as "No login in progress";
-  start it again.
+  means. A `--no-browser` login started with the previous CLI is refused as
+  `PENDING_LOGIN_UNREADABLE`; running `--no-browser` again replaces it.
 
 ## 0.9.3
 

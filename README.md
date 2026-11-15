@@ -36,7 +36,7 @@ you in: a browser tab opens on the StarZero login page, and the CLI stores the r
 `~/.starzero/credentials`, owner-only. Nothing is pasted into the chat. A browser login renews itself; any
 skill logs you in again if it ever ends, and a login made with a CLI before 0.16.0 asks for that once.
 On a machine without a browser, setup gives you a URL to open on any device and asks for the
-address the login ends on. An API key from
+sign-in code the page you log in on shows. An API key from
 https://app.starzero.ai/settings/api-keys works too (`starzero auth login --api-key`), for example
 in a cloud session where `STARZERO_API_KEY` is set as an environment variable.
 
