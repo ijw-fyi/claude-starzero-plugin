@@ -33,7 +33,7 @@ jobs:
           exit $status
       - name: Manifests and skills agree on the versions
         run: |
-          v=$(sed -n 's/^The pinned version is \([0-9.][0-9.]*\)\.$/\1/p' reference/install.md)
+          v=$(sed -n 's/.*The pinned version is \([0-9.][0-9.]*\)\..*/\1/p' reference/install.md)
           test -n "$v" || { echo "reference/install.md names no pinned version"; exit 1; }
           grep -q "^v=$v;" reference/install.md || { echo "the install snippet pins a different version than the sentence"; exit 1; }
           for f in skills/*/SKILL.md; do
@@ -46,7 +46,7 @@ jobs:
           echo "versions agree: plugin $pv, cli $v; descriptions agree"
       - name: The install commands in reference/install.md install the pinned CLI
         run: |
-          v=$(sed -n 's/^The pinned version is \([0-9.][0-9.]*\)\.$/\1/p' reference/install.md)
+          v=$(sed -n 's/.*The pinned version is \([0-9.][0-9.]*\)\..*/\1/p' reference/install.md)
           home=$(mktemp -d)
           awk '/^```sh$/{f=1;next} /^```$/{f=0} f' reference/install.md > "$home/install.sh"
           HOME="$home" sh "$home/install.sh"
